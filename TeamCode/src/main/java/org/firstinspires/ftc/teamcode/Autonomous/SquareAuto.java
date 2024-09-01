@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.teamcode.drive.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
-
+import org.firstinspires.ftc.teamcode.subsytems.Gripper;
 
 @Autonomous
 //@Disabled
@@ -21,14 +21,16 @@ public class SquareAuto extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         MecanumDriveBase drive = new MecanumDriveBase(hardwareMap);
+        Gripper gripper= new Gripper(this);
+        gripper.init(hardwareMap);
 
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-
+/*
         //move forward 20 in
         Trajectory traj1 = drive.trajectoryBuilder(new Pose2d())
                 .forward(20)
                 .build();
-/*
+
         //move right while maintaining same heading for 20 in
         Trajectory traj2 = drive.trajectoryBuilder(traj1.end())
                 .strafeRight(20)
@@ -42,13 +44,13 @@ public class SquareAuto extends LinearOpMode {
         //move left while maintaining same heading for 20 in
         Trajectory traj4 = drive.trajectoryBuilder(traj3.end())
                 .strafeLeft(20)
-                .build();*/
+                .build();
 
         //move left while maintaining same heading for 20 in
         Trajectory traj5 = drive.trajectoryBuilder(new Pose2d())
                 .splineTo(new Vector2d(3,0),Math.toRadians(0))
                 .build();
-
+        */
         Trajectory traj6 = drive.trajectoryBuilder(new Pose2d())
                 //valid: .splineTo(new Vector2d(5,0),Math.toRadians(0))
                 //valid: .splineTo(new Vector2d(0,5),Math.toRadians(0))
@@ -60,6 +62,7 @@ public class SquareAuto extends LinearOpMode {
                 //  .splineTo(new Vector2d(5,5),Math.toRadians(0))
                 .build();
 
+
         waitForStart();
 /*
         drive.followTrajectory(traj1);
@@ -68,7 +71,16 @@ public class SquareAuto extends LinearOpMode {
         drive.followTrajectory(traj4);
         drive.followTrajectory(traj5);*/
         drive.followTrajectory(traj6);
-
+        // temporal  marker checkout
+        TrajectorySequence TestNow =drive.trajectorySequenceBuilder(new Pose2d())
+                .lineToLinearHeading(new Pose2d(15,15,Math.toRadians(90)))
+                .UNSTABLE_addTemporalMarkerOffset(0.0,()->{gripper.gripperClosed();})
+                .UNSTABLE_addTemporalMarkerOffset(0.0,()->{gripper.setAnglerUP();})
+                .lineToLinearHeading(new Pose2d(5,5,Math.toRadians(90)))
+                .UNSTABLE_addTemporalMarkerOffset(0.0,()->{gripper.gripperOpen();})
+                .UNSTABLE_addTemporalMarkerOffset(0.0,()->{gripper.setAnglerDown();})
+                .build();
+        drive.followTrajectorySequence(TestNow);
         telemetry.clearAll();
 
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
