@@ -20,8 +20,16 @@ public class DriveConstants {
     /*
      * These are motor constants that should be listed online for your motors.
      */
+    //https://www.gobilda.com/5203-series-yellow-jacket-motor-1-1-ratio-24mm-length-8mm-rex-shaft-6000-rpm-3-3-5v-encoder/
+    //https://www.gobilda.com/content/spec_sheets/5203-2402-0019_spec_sheet.pdf
+    //19.203 is drive motor encoder ratio
+    //28X19.203
     public static final double TICKS_PER_REV = 537.7;
+
+    // https://www.gobilda.com/content/user_manuals/5203-2402-0001_spec_sheet.pdf
+    //6000/19.203
     public static final double MAX_RPM = 312; // gobilda drive motor 19.203:1 ratio
+
 
     /*
      * Set RUN_USING_ENCODER to true to enable built-in hub velocity control using drive encoders.
@@ -43,9 +51,13 @@ public class DriveConstants {
      * angular distances although most angular parameters are wrapped in Math.toRadians() for
      * convenience. Make sure to exclude any gear ratio included in MOTOR_CONFIG from GEAR_RATIO.
      */
-    public static double WHEEL_RADIUS = 30 / 25.4; // rev 60 mm diameter
+
+    //For 48 mm wheels
+    public static double WHEEL_RADIUS = 30 / 25.4; // change to 48 starting
+
     public static double GEAR_RATIO = 1; // output (wheel) speed / input (motor) speed
-    public static double TRACK_WIDTH = 14.5;
+    public static double TRACK_WIDTH = 16;// starting 11.5
+
 
     /*
      * These are the feedforward parameters used to model the drive motor behavior. If you are using
@@ -53,9 +65,9 @@ public class DriveConstants {
      * motor encoders or have elected not to use them for velocity control, these values should be
      * empirically tuned.
      */
-    public static double kV = 0.018; //1.0 / rpmToVelocity(MAX_RPM) orginal was 0.017
+    public static double kV = 0.0165; //1.0 / rpmToVelocity(MAX_RPM) orginal was 0.017
     public static double kA = 0.002;
-    public static double kStatic = 0.003;
+    public static double kStatic = 0.0;
 
     /*
      * These values are used to generate the trajectories for you robot. To ensure proper operation,
