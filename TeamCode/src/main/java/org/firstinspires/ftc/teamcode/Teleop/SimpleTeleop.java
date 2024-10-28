@@ -22,14 +22,14 @@ public class SimpleTeleop extends LinearOpMode {
     FtcDashboard dashboard;
     Gripper gripper = new Gripper(this);
 
-    double speedFactor = 1.0;
+    double speedFactor = 0.5;
     @Override
     public void runOpMode() throws InterruptedException {
         // set up Mecanum Drive
         MecanumDriveBase drive = new MecanumDriveBase(hardwareMap); // this has to be here inside the runopmode. The others go above as class variables
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        gripper.init(hardwareMap);
+        //gripper.init(hardwareMap);
 
 
         dashboard = FtcDashboard.getInstance();
@@ -40,8 +40,8 @@ public class SimpleTeleop extends LinearOpMode {
         // WAIT FOR MATCH TO START
         ///////////////////////////////////////////////////////////////////////////////////////////
 
-        gripper.gripperClosed();
-        gripper.setAnglerDown();
+       // gripper.gripperClosed();
+       // gripper.setAnglerDown();
 
         waitForStart();
         teleopTimer.reset();
@@ -49,13 +49,13 @@ public class SimpleTeleop extends LinearOpMode {
         while (!isStopRequested() && teleopTimer.time() < TELEOP_TIME_OUT) {
             drive.setWeightedDrivePower(
                     new Pose2d(
-                            -gamepad1.left_stick_y * speedFactor,
+                            -gamepad1.right_stick_y * speedFactor,
                             -gamepad1.left_stick_x * speedFactor,
                             -gamepad1.right_stick_x * speedFactor
                     )
             );
 
-            if(gamepad1.right_trigger > 0.25){
+            /*if(gamepad1.right_trigger > 0.25){
                 gripper.gripperOpen();
             }
 
@@ -69,7 +69,7 @@ public class SimpleTeleop extends LinearOpMode {
 
             if(gamepad1.left_bumper){
                 gripper.setAnglerDown();
-            }
+            }*/
         }
     }
 }
