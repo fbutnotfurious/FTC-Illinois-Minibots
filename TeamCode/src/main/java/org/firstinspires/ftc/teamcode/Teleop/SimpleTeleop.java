@@ -7,6 +7,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.drive.MecanumDriveBase;
@@ -18,6 +19,7 @@ import org.firstinspires.ftc.teamcode.subsytems.Gripper;
 public class SimpleTeleop extends LinearOpMode {
     private ElapsedTime teleopTimer = new ElapsedTime();
     private final float TELEOP_TIME_OUT = 140; // WARNING: LOWER FOR OUTREACH
+    private DcMotorEx ArmMotor;
 
     FtcDashboard dashboard;
     Gripper gripper = new Gripper(this);
@@ -28,6 +30,8 @@ public class SimpleTeleop extends LinearOpMode {
         // set up Mecanum Drive
         MecanumDriveBase drive = new MecanumDriveBase(hardwareMap); // this has to be here inside the runopmode. The others go above as class variables
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        ArmMotor = hardwareMap.get(DcMotorEx.class, "ArmMotor");
+
 
         //gripper.init(hardwareMap);
 
@@ -46,7 +50,9 @@ public class SimpleTeleop extends LinearOpMode {
         waitForStart();
         teleopTimer.reset();
 
-        while (!isStopRequested() && teleopTimer.time() < TELEOP_TIME_OUT) {
+
+
+        while (!isStopRequested()) { //&& teleopTimer.time() < TELEOP_TIME_OUT
             drive.setWeightedDrivePower(
                     new Pose2d(
                             -gamepad1.right_stick_y * speedFactor,
@@ -55,6 +61,20 @@ public class SimpleTeleop extends LinearOpMode {
                     )
             );
 
+            if (gamepad1.left_trigger >0) {
+                ArmMotor.setPower(0.4);
+            }
+            else {
+
+
+                if(gamepad1.right_trigger >0)
+                {
+                    ArmMotor.setPower(-0.4);
+                }
+                else ArmMotor.setPower(0.0);
+
+                }
+            }
             /*if(gamepad1.right_trigger > 0.25){
                 gripper.gripperOpen();
             }
@@ -72,4 +92,3 @@ public class SimpleTeleop extends LinearOpMode {
             }*/
         }
     }
-}

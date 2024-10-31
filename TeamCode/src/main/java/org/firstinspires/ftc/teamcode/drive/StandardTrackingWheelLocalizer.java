@@ -32,13 +32,13 @@ public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer 
     public static double WHEEL_RADIUS = 24/25.4; //  odometry pod wheels are 24 radius from 30 (48 mm dia) REV are 60
     public static double GEAR_RATIO = 1; // output (wheel) speed / input (encoder) speed
 
-    public static double LATERAL_DISTANCE = 12; // starting 12 in from 10.83; distance between the left and right wheels
+    public static double LATERAL_DISTANCE = 11.49; // starting 12 in from 10.83; distance between the left and right wheels
     public static double FORWARD_OFFSET = 1.5; // starting 1.5 in from 2; offset of the lateral wheel
 
     private Encoder leftEncoder, rightEncoder, perpendicularEncoder;
 
-    public static double X_MULTIPLIER = 1.011; // Multiplier in the X direction
-    public static double Y_MULTIPLIER = 1.0146; // Multiplier in the Y directio
+    public static double X_MULTIPLIER = 0.979; // Multiplier in the X direction
+    public static double Y_MULTIPLIER = 0.986; // Multiplier in the Y direction
 
     public StandardTrackingWheelLocalizer(HardwareMap hardwareMap) {
         super(Arrays.asList(
