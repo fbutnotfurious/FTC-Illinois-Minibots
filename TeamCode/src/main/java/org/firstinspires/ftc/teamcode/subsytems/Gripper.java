@@ -18,20 +18,22 @@ import static java.lang.Thread.sleep;
 public class Gripper {
 
     //Define Hardware Objects
-    private Servo            gripper     = null;
-    private Servo            angler             = null;
+    private Servo gripper     = null;
+    private Servo angler      = null;
 
 
 
     //Constants for gripper
     //larer numbers are more clockwise
 
-    private static final double      GRIPPER_CLOSED      = 0.6; //to close more, increase
-    private static final double      GRIPPER_OPEN        = 0.39; //to open more, decrease
+
+    private static final double Gripper_STOP = 0.5; //speed servo stopped
+    private static final double Gripper_FORWARD = 1.0; //full speed forward
+    private static final double Gripper_REVERSE = 0.0; //full speed backward
 
 
-    private static final double      ANGLER_UP     = 0.6; // deposit the pixel
-    private static final double      ANGLER_DOWN      = 0.45; // Loading the pixel
+    private static final double      ANGLER_UP     = 1.0; // deposit the pixel
+    private static final double      ANGLER_DOWN      = 0.65; // Loading the pixel
     Telemetry       telemetry;
     LinearOpMode    opmode; // need content from Linear opmodes here. Elapsed time mainly
 
@@ -57,11 +59,14 @@ public class Gripper {
 
     }
 
-    public void gripperClosed(){
-        gripper.setPosition(GRIPPER_CLOSED);
+    public void gripperReverse(){
+        gripper.setPosition(Gripper_REVERSE);
     }
-    public void gripperOpen(){
-        gripper.setPosition(GRIPPER_OPEN);
+    public void gripperForward(){
+        gripper.setPosition(Gripper_FORWARD);
+    }
+    public void gripperStopped(){
+        gripper.setPosition(Gripper_STOP);
     }
 
     public void setAnglerUP() {

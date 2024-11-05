@@ -19,8 +19,9 @@ import org.firstinspires.ftc.teamcode.subsytems.Gripper;
 public class SimpleTeleop extends LinearOpMode {
     private ElapsedTime teleopTimer = new ElapsedTime();
     private final float TELEOP_TIME_OUT = 140; // WARNING: LOWER FOR OUTREACH
+    private static final double           RaiseSPEED                  = 1.0; // full spee
     private DcMotorEx ArmMotor;
-
+    private DcMotorEx TwoStageMotor;
     FtcDashboard dashboard;
     Gripper gripper = new Gripper(this);
 
@@ -31,9 +32,12 @@ public class SimpleTeleop extends LinearOpMode {
         MecanumDriveBase drive = new MecanumDriveBase(hardwareMap); // this has to be here inside the runopmode. The others go above as class variables
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         ArmMotor = hardwareMap.get(DcMotorEx.class, "ArmMotor");
+        TwoStageMotor = hardwareMap.get(DcMotorEx.class, "TwoStageMotor");
 
 
-        //gripper.init(hardwareMap);
+        gripper.init(hardwareMap);
+        ArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        TwoStageMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
         dashboard = FtcDashboard.getInstance();
@@ -44,8 +48,8 @@ public class SimpleTeleop extends LinearOpMode {
         // WAIT FOR MATCH TO START
         ///////////////////////////////////////////////////////////////////////////////////////////
 
-       // gripper.gripperClosed();
-       // gripper.setAnglerDown();
+       gripper.gripperStopped();
+       gripper.setAnglerDown();
 
         waitForStart();
         teleopTimer.reset();
@@ -61,34 +65,69 @@ public class SimpleTeleop extends LinearOpMode {
                     )
             );
 
-            if (gamepad1.left_trigger >0) {
+            ArmMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            TwoStageMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            /*
+            int newTargetHeight;
+            newTargetHeight = (int)(2600);
+            // Set the target now that is has been calculated
+            ArmMotor.setTargetPosition(newTargetHeight);
+            // Turn On RUN_TO_POSITION
+            ArmMotor.setPower(Math.abs(RaiseSPEED));
+            // reset the timeout time and start motion.
+            ArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            // Set the target now that is has been calculated
+            //ArmMotor.setTargetPosition(70);*/
+
+
+            double currentPos;
+            if (gamepad2.left_bumper ) {
                 ArmMotor.setPower(0.4);
+                currentPos = ArmMotor.getCurrentPosition();
+                telemetry.addData("ArmPosition",currentPos);
+                telemetry.update();
             }
-            else {
-
-
-                if(gamepad1.right_trigger >0)
-                {
-                    ArmMotor.setPower(-0.4);
-                }
-                else ArmMotor.setPower(0.0);
-
-                }
-            }
-            /*if(gamepad1.right_trigger > 0.25){
-                gripper.gripperOpen();
+            else if (gamepad2.right_bumper) {
+                ArmMotor.setPower(-0.4);
+                currentPos = ArmMotor.getCurrentPosition();
+                telemetry.addData("ArmPosition",currentPos);
+                telemetry.update();
+            } else {
+                ArmMotor.setPower(0.0);
             }
 
-            if(gamepad1.left_trigger > 0.25){
-                gripper.gripperClosed();
+            if (gamepad2.left_trigger >0) {
+                TwoStageMotor.setPower(gamepad2.left_trigger);
+                currentPos = TwoStageMotor.getCurrentPosition();
+                telemetry.addData("TwoStagePosition",currentPos);
+                telemetry.update();
+            }
+            else if (gamepad2.right_trigger > 0) {
+                TwoStageMotor.setPower(-gamepad2.right_trigger);
+                currentPos = TwoStageMotor.getCurrentPosition();
+                telemetry.addData("TwoStagePosition",currentPos);
+                telemetry.update();
+            } else {
+                TwoStageMotor.setPower(0.0);
             }
 
-            if(gamepad1.right_bumper){
+            if(gamepad2.x){
                 gripper.setAnglerUP();
             }
 
-            if(gamepad1.left_bumper){
+            if(gamepad2.y){
                 gripper.setAnglerDown();
-            }*/
+            }
+
+            if(gamepad2.left_stick_x > 0.2){
+
+                gripper.gripperForward();
+            }
+
+            if(gamepad2.left_stick_x <-0.2){
+                gripper.gripperReverse();
+
+            }
         }
     }
+}
