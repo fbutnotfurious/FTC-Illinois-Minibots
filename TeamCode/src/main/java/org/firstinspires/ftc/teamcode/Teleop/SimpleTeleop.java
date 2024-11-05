@@ -23,6 +23,7 @@ public class SimpleTeleop extends LinearOpMode {
     private DcMotorEx ArmMotor;
     private DcMotorEx TwoStageMotor;
     FtcDashboard dashboard;
+    ElapsedTime runtime = new ElapsedTime();
     Gripper gripper = new Gripper(this);
 
     double speedFactor = 0.5;
@@ -53,8 +54,6 @@ public class SimpleTeleop extends LinearOpMode {
 
         waitForStart();
         teleopTimer.reset();
-
-
 
         while (!isStopRequested()) { //&& teleopTimer.time() < TELEOP_TIME_OUT
             drive.setWeightedDrivePower(
@@ -120,13 +119,14 @@ public class SimpleTeleop extends LinearOpMode {
             }
 
             if(gamepad2.left_stick_x > 0.2){
-
-                gripper.gripperForward();
+                gripper.gripperForward(gamepad2.left_stick_x);
             }
+            else if(gamepad2.left_stick_x <-0.2){
+                gripper.gripperReverse(gamepad2.left_stick_x);
 
-            if(gamepad2.left_stick_x <-0.2){
-                gripper.gripperReverse();
-
+            }
+            else{
+                gripper.gripperStopped();
             }
         }
     }

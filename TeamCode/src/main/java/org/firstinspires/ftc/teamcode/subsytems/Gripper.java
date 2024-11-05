@@ -59,11 +59,21 @@ public class Gripper {
 
     }
 
-    public void gripperReverse(){
-        gripper.setPosition(Gripper_REVERSE);
+    public void gripperReverse(double factor){
+        //makes new level by taking factor to adjust the right position
+        double newLevel = 1.0+factor*0.5;
+        //finding reverse control, between 0-0.5
+        newLevel= Math.max(0.5, Math.min(Gripper_REVERSE,newLevel));
+        //adjusts
+        gripper.setPosition(newLevel);
     }
-    public void gripperForward(){
-        gripper.setPosition(Gripper_FORWARD);
+    public void gripperForward(double factor){
+        //new level factor to adjust right position
+        double newLevel = factor*0.5+0.5;
+        //forward, between 0.5-1
+        newLevel = Math.min(Math.max(0.5,newLevel),Gripper_FORWARD);
+        //adjusts
+        gripper.setPosition(newLevel);
     }
     public void gripperStopped(){
         gripper.setPosition(Gripper_STOP);
