@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 
-public class test extends LinearOpMode {
+public class test_attempt1 extends LinearOpMode {
     //Declare opmode members
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor leftDrive = null;
