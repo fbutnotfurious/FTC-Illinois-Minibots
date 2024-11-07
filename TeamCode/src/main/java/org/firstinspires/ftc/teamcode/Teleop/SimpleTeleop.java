@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import org.firstinspires.ftc.teamcode.Teleop.ArmControl;
 
 import org.firstinspires.ftc.teamcode.drive.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.subsytems.Gripper;
@@ -22,6 +23,7 @@ public class SimpleTeleop extends LinearOpMode {
     private static final double           RaiseSPEED                  = 1.0; // full spee
     private DcMotorEx ArmMotor;
     private DcMotorEx TwoStageMotor;
+    private ArmControl armControl;
     FtcDashboard dashboard;
     ElapsedTime runtime = new ElapsedTime();
     Gripper gripper = new Gripper(this);
@@ -34,11 +36,12 @@ public class SimpleTeleop extends LinearOpMode {
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         ArmMotor = hardwareMap.get(DcMotorEx.class, "ArmMotor");
         TwoStageMotor = hardwareMap.get(DcMotorEx.class, "TwoStageMotor");
-
+        armControl = new ArmControl(hardwareMap);
 
         gripper.init(hardwareMap);
         ArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         TwoStageMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        ArmMotor.setDirection(DcMotor.Direction.REVERSE);
 
 
         dashboard = FtcDashboard.getInstance();
@@ -55,7 +58,7 @@ public class SimpleTeleop extends LinearOpMode {
         waitForStart();
         teleopTimer.reset();
 
-        while (!isStopRequested()) { //&& teleopTimer.time() < TELEOP_TIME_OUT
+        while (!isStopRequested() && teleopTimer.time() < TELEOP_TIME_OUT) { //&& teleopTimer.time() < TELEOP_TIME_OUT
             drive.setWeightedDrivePower(
                     new Pose2d(
                             -gamepad1.right_stick_y * speedFactor,
@@ -78,16 +81,16 @@ public class SimpleTeleop extends LinearOpMode {
             // Set the target now that is has been calculated
             //ArmMotor.setTargetPosition(70);*/
 
-
+            // ArmMotor control using gamepad2.right_stick_y
             double currentPos;
-            if (gamepad2.left_bumper ) {
-                ArmMotor.setPower(0.4);
+            if (gamepad2.right_stick_y>0.1) {
+                ArmMotor.setPower(Math.min(1.0,gamepad2.right_stick_y));
                 currentPos = ArmMotor.getCurrentPosition();
                 telemetry.addData("ArmPosition",currentPos);
                 telemetry.update();
             }
-            else if (gamepad2.right_bumper) {
-                ArmMotor.setPower(-0.4);
+            else if (gamepad2.right_stick_y<-0.1) {
+                ArmMotor.setPower(Math.max(-1,gamepad2.right_stick_y));
                 currentPos = ArmMotor.getCurrentPosition();
                 telemetry.addData("ArmPosition",currentPos);
                 telemetry.update();
@@ -128,6 +131,17 @@ public class SimpleTeleop extends LinearOpMode {
             else{
                 gripper.gripperStopped();
             }
+            if( teleopTimer.time() > 20) {
+
+                armControl.setDesArmPosDeg(20);
+                telemetry.addData("AngleInfo",0);
+                telemetry.update();
+
+            }
+
+
         }
+
+
     }
 }

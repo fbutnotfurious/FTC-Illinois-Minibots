@@ -24,9 +24,12 @@ public class ArmControl {
     private DcMotorEx armMotor;
     private double actArmPosDeg = 0.0;
     private double initialPosDeg=-22;
-    private static double desArmPosDeg = 20.0;
+
     private double errPrev = 0.0;
     private double errAccum = 0.0;
+
+    private double desArmPosDeg = 80.0;
+
 
     // Constructor to initialize the arm motor
     public ArmControl(HardwareMap hardwareMap) {
@@ -44,6 +47,7 @@ public class ArmControl {
     }
 
     // Update method for PIDF control
+    //public void update(double kP, double kI, double kD, double kS, double kG) {
     public void update() {
         // Read the encoder and convert ticks to degrees
         int ticks = armMotor.getCurrentPosition();

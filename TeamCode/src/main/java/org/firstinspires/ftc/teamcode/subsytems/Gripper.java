@@ -55,15 +55,16 @@ public class Gripper {
         // Initialize the gripper
         gripper = hwMap.get(Servo.class,"gripper"); //Exp Hub port 4
         angler = hwMap.get(Servo.class,"angler"); // Exp Hub port 0
+        gripper.setDirection(Servo.Direction.REVERSE);
 
 
     }
 
     public void gripperReverse(double factor){
         //makes new level by taking factor to adjust the right position
-        double newLevel = 1.0+factor*0.5;
+        double newLevel = 0.5+factor*0.5;
         //finding reverse control, between 0-0.5
-        newLevel= Math.max(0.5, Math.min(Gripper_REVERSE,newLevel));
+        newLevel= Math.min(0.5, Math.max(Gripper_REVERSE,newLevel));
         //adjusts
         gripper.setPosition(newLevel);
     }
