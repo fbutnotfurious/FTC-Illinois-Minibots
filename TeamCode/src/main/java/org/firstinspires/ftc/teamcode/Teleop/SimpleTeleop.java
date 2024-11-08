@@ -117,13 +117,19 @@ public class SimpleTeleop extends LinearOpMode {
             if(gamepad2.y){
                 gripper.setAnglerDown();
             }
+            double gp2_lx;
+            if(gamepad2.left_stick_x > 0.1){
+                gp2_lx= gamepad2.left_stick_x;
+                telemetry.addData("GP2 Left x",gp2_lx);
+                telemetry.update();
 
-            if(gamepad2.left_stick_x > 0.2){
                 gripper.gripperForward(gamepad2.left_stick_x);
             }
-            else if(gamepad2.left_stick_x <-0.2){
+            else if(gamepad2.left_stick_x <-0.1){
                 gripper.gripperReverse(gamepad2.left_stick_x);
-
+                gp2_lx= gamepad2.left_stick_x;
+                telemetry.addData("GP2 Left x",gp2_lx);
+                telemetry.update();
             }
             else{
                 gripper.gripperStopped();
