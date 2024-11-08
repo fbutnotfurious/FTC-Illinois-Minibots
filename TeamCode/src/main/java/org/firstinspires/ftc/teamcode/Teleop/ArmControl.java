@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class ArmControl {
 
     // PID and Feedforward Coefficients
-    public static double kP = 0.1; // Proportional Gain
+    public static double kP = 0.1; // Proportional Gain,
     public static double kI = 0.0; // Integral Gain
     public static double kD = 0.0; // Derivative Gain
     public static double kS = 0.0; // Static friction compensation
