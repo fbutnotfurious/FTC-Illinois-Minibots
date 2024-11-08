@@ -101,27 +101,37 @@ public class SimpleTeleop extends LinearOpMode {
             // - - - Arm Control with Hold Position Feature - - - //
             double armPower = gamepad2.right_stick_y;
             if (Math.abs(armPower) > 0.1) {  // If driver moves the arm
-                ArmMotor.setPower(armPower);
-                holdingPosition = false; // Disable hold position mode
-            } else if (!holdingPosition) {  // When driver releases control
-                double currentArmPos = ArmMotor.getCurrentPosition() * (360.0 / 5 / 1425.1); // Adjust ticks to degrees
-                armControl.setDesArmPosDeg(currentArmPos); // Set current position as target
-                holdingPosition = true;
+                if(armPower>0){
+                ArmMotor.setPower(Math.min(0.8,armPower));}
+                else{
+                    ArmMotor.setPower(Math.max(-0.8,armPower));
+                }
             }
 
             // If in hold position mode, maintain the arm at the set position
-            if (holdingPosition) {
-                armControl.update();  // PID control to hold position
+            if (gamepad2.a) {
+                armControl.latch();  // PID control to hold position
+            }
+            // Release latching
+            if (gamepad2.b) {
+                ArmMotor.setPower(0);
             }
             // - - - Arm Control with Hold Position Feature - - - //
 
 
             // - - - Two-stage motor control - - - //
             // Controlling the two-stage motor using gamepad2's left and right triggers
+            double TwoStagePos;
             if (gamepad2.left_trigger > 0) {
                 TwoStageMotor.setPower(gamepad2.left_trigger); // Extend
+                TwoStagePos= TwoStageMotor.getCurrentPosition();
+                telemetry.addData("TwoStage Position", TwoStagePos);
+                telemetry.update();
             } else if (gamepad2.right_trigger > 0) {
                 TwoStageMotor.setPower(-gamepad2.right_trigger); // Retract
+                TwoStagePos= TwoStageMotor.getCurrentPosition();
+                telemetry.addData("TwoStage Position", TwoStagePos);
+                telemetry.update();
             } else {
                 TwoStageMotor.setPower(0); // Stop if neither trigger is pressed
             }

@@ -29,6 +29,8 @@ public class ArmControl {
     private double errAccum = 0.0;
 
     private double desArmPosDeg = 80.0;
+    private double degreesPerTick = 360.0 / 5/1425.1;
+    private int initstep=1;
 
 
     // Constructor to initialize the arm motor
@@ -51,8 +53,41 @@ public class ArmControl {
     public void update() {
         // Read the encoder and convert ticks to degrees
         int ticks = armMotor.getCurrentPosition();
-        double degreesPerTick = 360.0 / 5/1425.1; // Adjust this based on your encoder specifications
+
         this.actArmPosDeg = ticks * degreesPerTick + initialPosDeg;
+
+        // Calculate error
+        double err = this.desArmPosDeg - this.actArmPosDeg;
+
+        // Feedforward calculations
+        double staticFrictionCompensation = Math.signum(err) * kS;
+        double gravityCompensation = Math.cos(Math.toRadians(this.actArmPosDeg)) * kG;
+        double feedForwardVoltage = staticFrictionCompensation + gravityCompensation;
+
+        // PID calculations
+        this.errAccum += err * Ts;
+        double pTerm = err * kP;
+        double iTerm = this.errAccum * kI;
+        double dTerm = ((err - this.errPrev) / Ts) * kD;
+        this.errPrev = err;
+        double feedbackVoltage = pTerm + iTerm + dTerm;
+
+        // Calculate motor command as a fraction of available battery voltage
+        double motorCmd = (feedbackVoltage + feedForwardVoltage) / batteryVoltage;
+        motorCmd = Math.max(-1.0, Math.min(1.0, motorCmd)); // Limit to motor power range [-1, 1]
+
+        // Apply power to the motor
+        armMotor.setPower(motorCmd);
+    }
+    public void latch() {
+        // Read the encoder and convert ticks to degrees
+        //int ticks = ;
+        if (initstep==1) {
+            this.desArmPosDeg = armMotor.getCurrentPosition() * degreesPerTick + initialPosDeg;
+            ; // Adjust this based on your encoder specifications
+            initstep=0;
+        }
+        this.actArmPosDeg = armMotor.getCurrentPosition()*degreesPerTick + initialPosDeg;
 
         // Calculate error
         double err = this.desArmPosDeg - this.actArmPosDeg;
