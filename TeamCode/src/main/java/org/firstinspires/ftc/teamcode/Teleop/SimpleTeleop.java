@@ -30,7 +30,8 @@ public class SimpleTeleop extends LinearOpMode {
     private DcMotorEx TwoStageMotor;
     private ArmControl armControl;
     private Gripper gripper;
-    private double speedFactor = 0.5;
+    private double speedFactor = 0.65;
+    private int LatchInd= 0;
     private boolean holdingPosition = false; // Tracking if arm is in hold mode
     // - - - Constants + Variables - - - //
     //- - - - - - - - - - - - - - Initialization - - - - - - - - - - - -
@@ -98,22 +99,31 @@ public class SimpleTeleop extends LinearOpMode {
             // - - - Mecanum drive control - - - //
 
 
-            // - - - Arm Control with Hold Position Feature - - - //
-            double armPower = gamepad2.right_stick_y;
-            if (Math.abs(armPower) > 0.1) {  // If driver moves the arm
+            // - - - Arm Control with Hold Position Feature - - - /
+            if(Math.abs(gamepad2.right_stick_y) > 0.1){
+                ArmMotor.setPower(gamepad2.right_stick_y*0.65);
+            }
+            else{
+                ArmMotor.setPower(0);
+            }
+            /*if (Math.abs(armPower) > 0.1) {  // If driver moves the arm
                 if(armPower>0){
                 ArmMotor.setPower(Math.min(0.8,armPower));}
                 else{
                     ArmMotor.setPower(Math.max(-0.8,armPower));
                 }
-            }
+            }*/
 
             // If in hold position mode, maintain the arm at the set position
-            if (gamepad2.a) {
+
+            if (gamepad2.a) {   LatchInd=1;}
+
+            if(LatchInd ==1){
                 armControl.latch();  // PID control to hold position
             }
             // Release latching
             if (gamepad2.b) {
+                LatchInd=0;
                 ArmMotor.setPower(0);
             }
             // - - - Arm Control with Hold Position Feature - - - //
