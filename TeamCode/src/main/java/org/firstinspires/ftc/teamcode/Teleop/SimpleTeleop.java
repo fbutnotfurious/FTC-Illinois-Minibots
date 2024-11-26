@@ -33,11 +33,9 @@ public class SimpleTeleop extends LinearOpMode {
     private double speedFactor = 0.45;
     private int LatchInd= 0;
     private boolean holdingPosition = false; // Tracking if arm is in hold mode
+    FtcDashboard dashboard;
     // - - - Constants + Variables - - - //
     //- - - - - - - - - - - - - - Initialization - - - - - - - - - - - -
-
-
-
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -66,7 +64,7 @@ public class SimpleTeleop extends LinearOpMode {
         // - - - Configuring motor modes and behaviors - - - //
 
         // - - - Set up dashboard telemetry - - - //
-        FtcDashboard dashboard;
+
         dashboard = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
         // - - - Set up dashboard telemetry - - - //
@@ -104,25 +102,22 @@ public class SimpleTeleop extends LinearOpMode {
             if(Math.abs(gamepad2.right_stick_y) > 0.1){
                 ArmMotor.setPower(gamepad2.right_stick_y*0.65);
             }
-            else{
+            else {
                 ArmMotor.setPower(0);
             }
-            /*if (Math.abs(armPower) > 0.1) {  // If driver moves the arm
-                if(armPower>0){
-                ArmMotor.setPower(Math.min(0.8,armPower));}
-                else{
-                    ArmMotor.setPower(Math.max(-0.8,armPower));
-                }
-            }*/
 
             // If in hold position mode, maintain the arm at the set position
 
-            if (gamepad2.a) {   LatchInd=1;}
+            if (gamepad2.a) {
+                // Set latching indication to 1
+                LatchInd=1;
+            }
 
             if(LatchInd ==1){
+                // Holding the Arm in position when LatchInd is 1
                 armControl.latch();  // PID control to hold position
             }
-            // Release latching
+            // Release latching when gampad2 B button is pushed
             if (gamepad2.b) {
                 LatchInd=0;
                 ArmMotor.setPower(0);
@@ -132,7 +127,6 @@ public class SimpleTeleop extends LinearOpMode {
 
             // - - - Two-stage motor control - - - //
             // Controlling the two-stage motor using gamepad2's left and right triggers
-            double TwoStagePos;
             if (gamepad2.left_trigger > 0) {
                 TwoStageMotor.setPower(gamepad2.left_trigger); // Extend
             } else if (gamepad2.right_trigger > 0) {
@@ -145,7 +139,7 @@ public class SimpleTeleop extends LinearOpMode {
 
 
             // - - - Gripper control - - - //
-            // Control gripper andgle and position using gamepad2's buttons and left stick
+            // Control gripper angler and position using gamepad2's buttons and left stick
             if (gamepad2.x) gripper.setAnglerUP(); // Set angler to up position
             if (gamepad2.y) gripper.setAnglerDown(); // Set angler to down position
 
@@ -161,8 +155,8 @@ public class SimpleTeleop extends LinearOpMode {
             // - - - Telemetry Updates - - - //
             // Sending important data to telemetry to monitor
             telemetry.addData("Arm Position", ArmMotor.getCurrentPosition());
-            telemetry.addData("Holding Position", holdingPosition);
-            telemetry.addData("Elapsed Time", teleopTimer.time());
+            telemetry.addData("Holding Position", LatchInd);
+            telemetry.addData("Elapsed Time", "%.3f", teleopTimer.time());
             telemetry.addData("TwoStage Position", TwoStageMotor.getCurrentPosition());
             telemetry.update();
             // - - - Telemetry Updates - - - //
