@@ -58,9 +58,10 @@ public class SimpleTeleop extends LinearOpMode {
         // - - - Configuring motor modes and behaviors - - - //
         ArmMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         TwoStageMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        TwoStageMotor.setDirection(DcMotor.Direction.REVERSE);
         ArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         TwoStageMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        ArmMotor.setDirection(DcMotor.Direction.REVERSE);
+
         // - - - Configuring motor modes and behaviors - - - //
 
         // - - - Set up dashboard telemetry - - - //
@@ -95,24 +96,21 @@ public class SimpleTeleop extends LinearOpMode {
                     -gamepad1.left_stick_x * speedFactor, // Strafing Left/right
                     -gamepad1.right_stick_x * speedFactor // Rotation
             ));
-            // - - - Mecanum drive control - - - //
 
 
-            // - - - Arm Control with Hold Position Feature - - - /
+            // - - - Arm Control with Latching in Position Feature - - - /
             if(Math.abs(gamepad2.right_stick_y) > 0.1){
-                ArmMotor.setPower(gamepad2.right_stick_y*0.65);
+                ArmMotor.setPower(-1.0*gamepad2.right_stick_y*0.65);
             }
             else {
                 ArmMotor.setPower(0);
             }
 
-            // If in hold position mode, maintain the arm at the set position
-
+            // A button for latching in current position
             if (gamepad2.a) {
-                // Set latching indication to 1
+                // Set latching indication to 1 to maintain the arm at the current position
                 LatchInd=1;
             }
-
             if(LatchInd ==1){
                 // Holding the Arm in position when LatchInd is 1
                 armControl.latch();  // PID control to hold position
@@ -120,22 +118,21 @@ public class SimpleTeleop extends LinearOpMode {
             // Release latching when gampad2 B button is pushed
             if (gamepad2.b) {
                 LatchInd=0;
-                ArmMotor.setPower(0);
+                //ArmMotor.setPower(0);
             }
-            // - - - Arm Control with Hold Position Feature - - - //
 
 
             // - - - Two-stage motor control - - - //
             // Controlling the two-stage motor using gamepad2's left and right triggers
             if (gamepad2.left_trigger > 0) {
-                TwoStageMotor.setPower(gamepad2.left_trigger); // Extend
+                TwoStageMotor.setPower(-gamepad2.left_trigger); // Extend
             } else if (gamepad2.right_trigger > 0) {
-                TwoStageMotor.setPower(-gamepad2.right_trigger); // Retract
+                TwoStageMotor.setPower(gamepad2.right_trigger); // Retract
 
             } else {
                 TwoStageMotor.setPower(0); // Stop if neither trigger is pressed
             }
-            // - - - Two-stage motor control - - - //
+
 
 
             // - - - Gripper control - - - //
@@ -150,16 +147,17 @@ public class SimpleTeleop extends LinearOpMode {
             } else {
                 gripper.gripperStopped(); // Stop gripper movement
             }
-            // - - - Gripper control - - - //
+
 
             // - - - Telemetry Updates - - - //
             // Sending important data to telemetry to monitor
             telemetry.addData("Arm Position", ArmMotor.getCurrentPosition());
+            telemetry.addData("Arm Motor Power", "%.2f",ArmMotor.getPower());
             telemetry.addData("Holding Position", LatchInd);
             telemetry.addData("Elapsed Time", "%.3f", teleopTimer.time());
             telemetry.addData("TwoStage Position", TwoStageMotor.getCurrentPosition());
             telemetry.update();
-            // - - - Telemetry Updates - - - //
+
         }
     }
 }

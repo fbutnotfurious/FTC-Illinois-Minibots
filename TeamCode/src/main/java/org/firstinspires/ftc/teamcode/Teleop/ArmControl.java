@@ -9,10 +9,10 @@ public class ArmControl {
 
     // PID and Feedforward Coefficients
     public static double kP = 0.5; // Proportional Gain,
-    public static double kI = 0.9; // Integral Gain
+    public static double kI = 0.2; // Integral Gain
     public static double kD = 0.0; // Derivative Gain
-    public static double kS = 0.1; // Static friction compensation
-    public static double kG = 5; // Gravity compensation
+    public static double kS = 0.15; // Static friction compensation
+    public static double kG = 2; // Gravity compensation
 
     // Sample Time (in seconds) for the PID loop
     public double Ts = 0.01;
