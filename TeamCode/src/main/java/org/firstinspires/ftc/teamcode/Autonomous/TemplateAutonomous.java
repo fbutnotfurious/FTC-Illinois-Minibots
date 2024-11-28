@@ -5,7 +5,6 @@ package org.firstinspires.ftc.teamcode.Autonomous;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 // Provides the ability to define a robot's position using x, y coordinates and heading (angle).
 
-import com.acmerobotics.roadrunner.geometry.Vector2d;
 // Used for handling 2D points in space, such as waypoints or targets.
 
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
@@ -20,10 +19,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 // Provides access to motor hardware and basic methods like setPower() and setMode().
 
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 // Extends DcMotor to include advanced functionality like setting velocity or accessing encoder data.
 
-import org.firstinspires.ftc.teamcode.Teleop.ArmControl;
 // A custom subsystem class (we wrote/will write) to manage arm control.
 
 import org.firstinspires.ftc.teamcode.drive.MecanumDriveBase;
@@ -32,9 +29,6 @@ import org.firstinspires.ftc.teamcode.drive.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.subsytems.Gripper;
 // Our ripper subsystem class, providing methods to open, close, or manipulate objects.
 
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
-
-import javax.tools.ForwardingFileObject;
 // Extends trajectory functionality to handle multiple sequential paths and movements.
 
 // - - - - - - - - - - - - - - - - - - - - - - Imports - - - - - - - - - - - - - - - - - - - - - - //
