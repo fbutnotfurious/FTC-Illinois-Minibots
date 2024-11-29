@@ -110,6 +110,12 @@ public class ArmControl {
         motorCmd = Math.max(-1.0, Math.min(1.0, motorCmd)); // Limit to motor power range [-1, 1]
 
         // Apply power to the motor
-        armMotor.setPower(motorCmd);
-    }
+        if( err> 1){
+            armMotor.setPower(motorCmd);
+        } else{
+            // Fix the arm motor power when the error is less than 1 deg
+            armMotor.setPower(armMotor.getPower());
+        }
+
+        }
 }
