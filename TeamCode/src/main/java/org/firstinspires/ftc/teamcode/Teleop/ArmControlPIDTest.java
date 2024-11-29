@@ -24,11 +24,11 @@ public class ArmControlPIDTest extends LinearOpMode {
 
     // - - - Constants + Variables - - - //
     // PID tune for ArmControl
-    public static double tgtAngleDeg=20;
-    public static double kP = 0.0; // Proportional Gain,
-    public static double kI = 0.0; // Integral Gain
+    public static double tgtAngleDeg=10;
+    public static double kP = 9; // Proportional Gain,
+    public static double kI = 2; // Integral Gain
     public static double kD = 0.0; // Derivative Gain
-    public  static double kS = 0.15; // Static friction compensation
+    public  static double kS = 0.0; // Static friction compensation
 
     private DcMotorEx armMotor;
 
@@ -36,6 +36,8 @@ public class ArmControlPIDTest extends LinearOpMode {
     private double degreesPerTick = 360.0 / 5/1425.1;
 
     private int newTargetTicks;
+
+    private PIDFCoefficients Default_Pid;
 
     FtcDashboard dashboard;
 
@@ -47,10 +49,13 @@ public class ArmControlPIDTest extends LinearOpMode {
         // - - - - - - - - - - Initialize components - - - - - - - - - -
 
         armMotor = hardwareMap.get(DcMotorEx.class, "ArmMotor");
-        armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        armMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         armMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        Default_Pid=armMotor.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER); // 10,3,0,0
+        PIDFCoefficients pidTurner_New = new PIDFCoefficients(kP, kI, kD, kS);
+        armMotor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidTurner_New);
 
-        //armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
         // - - - Set up dashboard telemetry - - - //
@@ -69,22 +74,22 @@ public class ArmControlPIDTest extends LinearOpMode {
         // - - - - - - - - - - Main Teleop Loop - - - - - - - - - -
 
         while (!isStopRequested()) {
-            PIDFCoefficients pidTurner_New = new PIDFCoefficients(kP, kI, kD, kS);
-            armMotor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidTurner_New);
+
 
             newTargetTicks = (int) ((tgtAngleDeg - initialPosDeg) / degreesPerTick);
 
             // Turn On RUN_TO_POSITION
             //armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             //armMotor.setTargetPosition(newTargetTicks);
-            if ( teleopTimer.time() >20){
-                armMotor.setPower(0.3);
-                System.out.println("Positive Power");}
-            else {
-                armMotor.setPower(-0.3);
-                System.out.println("Negative Power");
-
+            armMotor.setPower(0.2);
+            if ( teleopTimer.time() >20 && teleopTimer.time() <30){
+                newTargetTicks=newTargetTicks+200;
+            } else if(teleopTimer.time() >30){
+                newTargetTicks=400;
             }
+
+            armMotor.setTargetPosition(newTargetTicks);
+            armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             // reset the timeout time and start motion.
             //runtime.reset();
 
@@ -95,8 +100,14 @@ public class ArmControlPIDTest extends LinearOpMode {
             // Sending important data to telemetry to monitor
             telemetry.addData("Test Arm Position target in Deg","%.3f", tgtAngleDeg);
             telemetry.addData("Test Arm New Tgt Ticks", newTargetTicks);
+            telemetry.addData("Test Arm New Tgt Ticks Get", armMotor.getTargetPosition());
             telemetry.addData("Test Arm current power", armMotor.getPower());
             telemetry.addData("Test rm current posi", armMotor.getCurrentPosition());
+            telemetry.addData("Current Time", "%.3f",teleopTimer.time());
+            telemetry.addData("KP", "%.3f",Default_Pid.p);
+            telemetry.addData("KI", "%.3f",Default_Pid.i);
+            telemetry.addData("KD", "%.3f",Default_Pid.d);
+            telemetry.addData("KF", "%.3f",Default_Pid.f);
             telemetry.update();
 
         }
