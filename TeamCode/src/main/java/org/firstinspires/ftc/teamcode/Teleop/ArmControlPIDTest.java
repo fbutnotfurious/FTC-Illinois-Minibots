@@ -52,8 +52,8 @@ public class ArmControlPIDTest extends LinearOpMode {
         armMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         armMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         Default_Pid=armMotor.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER); // 10,3,0,0
-        PIDFCoefficients pidTurner_New = new PIDFCoefficients(kP, kI, kD, kS);
-        armMotor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidTurner_New);
+        //PIDFCoefficients pidTurner_New = new PIDFCoefficients(kP, kI, kD, kS);
+        //armMotor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidTurner_New);
 
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
@@ -104,6 +104,8 @@ public class ArmControlPIDTest extends LinearOpMode {
             telemetry.addData("Test Arm current power", armMotor.getPower());
             telemetry.addData("Test rm current posi", armMotor.getCurrentPosition());
             telemetry.addData("Current Time", "%.3f",teleopTimer.time());
+            // Example to push all the data into one line
+            telemetry.addLine("Default PID Info: ");
             telemetry.addData("KP", "%.3f",Default_Pid.p);
             telemetry.addData("KI", "%.3f",Default_Pid.i);
             telemetry.addData("KD", "%.3f",Default_Pid.d);
