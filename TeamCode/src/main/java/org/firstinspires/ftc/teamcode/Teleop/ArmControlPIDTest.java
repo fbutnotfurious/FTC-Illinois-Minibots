@@ -81,7 +81,7 @@ public class ArmControlPIDTest extends LinearOpMode {
             // Turn On RUN_TO_POSITION
             //armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             //armMotor.setTargetPosition(newTargetTicks);
-            armMotor.setPower(0.2);
+            armMotor.setPower(0.4);
             if ( teleopTimer.time() >20 && teleopTimer.time() <30){
                 newTargetTicks=newTargetTicks+200;
             } else if(teleopTimer.time() >30){
@@ -104,6 +104,7 @@ public class ArmControlPIDTest extends LinearOpMode {
             telemetry.addData("Test Arm current power", armMotor.getPower());
             telemetry.addData("Test rm current posi", armMotor.getCurrentPosition());
             telemetry.addData("Current Time", "%.3f",teleopTimer.time());
+            telemetry.addData("Arm Tgt Pos tolerance in Ticks", armMotor.getTargetPositionTolerance());
             // Example to push all the data into one line
             telemetry.addLine("Default PID Info: ");
             telemetry.addData("KP", "%.3f",Default_Pid.p);
