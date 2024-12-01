@@ -57,13 +57,7 @@ public class SimpleTeleop extends LinearOpMode {
 
         // - - - Setting up arm, two-stage motors, and gripper - - - //
         armControl = new ArmControl(hardwareMap);
-        ArmMotor = hardwareMap.get(DcMotorEx.class, "ArmMotor");
-        ArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        ArmMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        ArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        Default_Pid=ArmMotor.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
         gripper = new Gripper(this);
-        // - - - Setting up arm and two-stage motors, and gripper - - - //
 
 
         // - - - Configuring motor modes and behaviors - - - //
@@ -75,10 +69,9 @@ public class SimpleTeleop extends LinearOpMode {
         // - - - Configuring motor modes and behaviors - - - //
 
         // - - - Set up dashboard telemetry - - - //
-
         dashboard = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
-        // - - - Set up dashboard telemetry - - - //
+
 
 
         // - - - Initialize gripper to starting position - - - //
@@ -108,12 +101,14 @@ public class SimpleTeleop extends LinearOpMode {
             ));
 
 
-            // - - - Arm Control with Latching in Position Feature - - - /
-            if(Math.abs(gamepad2.right_stick_y) > 0.1){
-                armControl.setArmPower(-1.0*gamepad2.right_stick_y*0.65);
-            }
-            else {
-                armControl.setArmPower(0);
+            // - - - Arm Control - - - /
+            // Allow user to control the arm position
+            if( IntakeInd==0 && LatchInd==0 && DepositInd==0) {
+                if (Math.abs(gamepad2.right_stick_y) > 0.1) {
+                    armControl.setArmPower(-1.0 * gamepad2.right_stick_y * 0.65);
+                } else {
+                    armControl.setArmPower(0);
+                }
             }
 
             // A button for latching in current position
@@ -127,10 +122,7 @@ public class SimpleTeleop extends LinearOpMode {
 
             if(LatchInd ==1){
                 // Holding the Arm in position when LatchInd is 1
-                //armControl.setDesArmPosDeg(ArmCurPosDeg);
-                ArmMotor.setTargetPosition(armControl.getTgtArmPosTick(ArmCurPosDeg));
-                ArmMotor.setPower(RuntoPositionPower);
-                ArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                armControl.setDesArmPosDeg(ArmCurPosDeg);
             }
 
             // Left bumper to set Arm to the Deposit angle for depositing the sample
@@ -140,10 +132,7 @@ public class SimpleTeleop extends LinearOpMode {
                 LatchInd=0;
             }
             if(DepositInd==1){
-                //armControl.setArmDeposit();
-                ArmMotor.setTargetPosition(1200);
-                ArmMotor.setPower(RuntoPositionPower);
-                ArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                armControl.setArmDeposit();
             }
 
             // right bumper to set Arm to the intake angle for taking in the sample
@@ -153,18 +142,14 @@ public class SimpleTeleop extends LinearOpMode {
                 DepositInd=0;
             }
             if (IntakeInd==1) {
-                //armControl.setArmIntake();
-                ArmMotor.setTargetPosition(400);
-                ArmMotor.setPower(RuntoPositionPower);
-                ArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                armControl.setArmIntake();
             }
             // When gamepad2 B button is pushed, reset Arm runmode and rest all Indicators to zero
             if (gamepad2.b) {
-                LatchInd=0;
-                IntakeInd=0;
-                DepositInd=0;
-                ArmMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                ArmMotor.setPower(0);
+                LatchInd = 0;
+                IntakeInd = 0;
+                DepositInd = 0;
+                armControl.ArmRunModReset();
             }
 
 
@@ -197,18 +182,12 @@ public class SimpleTeleop extends LinearOpMode {
 
             // - - - Telemetry Updates - - - //
             // Sending important data to telemetry to monitor
-            telemetry.addData("Arm Position in Degree","%.3f", armControl.getActArmPosDeg());
-            telemetry.addData("Arm Tgt Position in Ticks", ArmMotor.getTargetPosition());
-            telemetry.addData("Arm Current Position in Ticks", ArmMotor.getCurrentPosition());
-            telemetry.addData("Arm Tgt Pos tolerance in Ticks", ArmMotor.getTargetPositionTolerance());
+            telemetry.addData("Arm Actual Position in Degree","%.3f", armControl.getActArmPosDeg());
+            telemetry.addData("Arm Tgt Position in Ticks", armControl.getTgtArmTick());
+            telemetry.addData("Arm Current Position in Ticks", armControl.getActArmTick());
             telemetry.addData("Arm Motor Power", "%.2f",armControl.getArmPower());
             telemetry.addData("Elapsed Time", "%.2f", teleopTimer.time());
             telemetry.addData("TwoStage Position", TwoStageMotor.getCurrentPosition());
-            telemetry.addLine("Default PID Info: ");
-            telemetry.addData("KP", "%.3f",Default_Pid.p);
-            telemetry.addData("KI", "%.3f",Default_Pid.i);
-            telemetry.addData("KD", "%.3f",Default_Pid.d);
-            telemetry.addData("KF", "%.3f",Default_Pid.f);
             telemetry.update();
 
         }

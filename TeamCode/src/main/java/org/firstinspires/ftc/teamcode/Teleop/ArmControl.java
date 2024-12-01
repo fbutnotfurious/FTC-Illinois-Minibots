@@ -35,6 +35,14 @@ public class ArmControl {
         return (int)((TgtAngle-initialPosDeg)/degreesPerTick);
     }
 
+    public int getActArmTick(){
+        return ArmMotor.getCurrentPosition();
+    }
+
+    public int getTgtArmTick(){
+        return ArmMotor.getTargetPosition();
+    }
+
     // Run to position for the desired Arm Angle
     public void setDesArmPosDeg(double tgtArmPosDeg) {
         desArmPosTick = (int)((tgtArmPosDeg-initialPosDeg)/degreesPerTick);
