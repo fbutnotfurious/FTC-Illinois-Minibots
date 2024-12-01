@@ -163,7 +163,8 @@ public class SimpleTeleop extends LinearOpMode {
                 LatchInd=0;
                 IntakeInd=0;
                 DepositInd=0;
-                armControl.ArmRunModReset();
+                ArmMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                ArmMotor.setPower(0);
             }
 
 
@@ -197,8 +198,9 @@ public class SimpleTeleop extends LinearOpMode {
             // - - - Telemetry Updates - - - //
             // Sending important data to telemetry to monitor
             telemetry.addData("Arm Position in Degree","%.3f", armControl.getActArmPosDeg());
-            telemetry.addData("Arm Tgt Position in Ticks", ArmMotor.getCurrentPosition());
+            telemetry.addData("Arm Tgt Position in Ticks", ArmMotor.getTargetPosition());
             telemetry.addData("Arm Current Position in Ticks", ArmMotor.getCurrentPosition());
+            telemetry.addData("Arm Tgt Pos tolerance in Ticks", ArmMotor.getTargetPositionTolerance());
             telemetry.addData("Arm Motor Power", "%.2f",armControl.getArmPower());
             telemetry.addData("Elapsed Time", "%.2f", teleopTimer.time());
             telemetry.addData("TwoStage Position", TwoStageMotor.getCurrentPosition());
