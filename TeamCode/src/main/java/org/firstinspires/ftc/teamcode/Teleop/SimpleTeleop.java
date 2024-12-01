@@ -32,6 +32,8 @@ public class SimpleTeleop extends LinearOpMode {
     private Gripper gripper;
     private double speedFactor = 0.45;
     private int LatchInd= 0;
+    private int ArmCurPosition;
+    private int LpCnt=0;
     private boolean holdingPosition = false; // Tracking if arm is in hold mode
     FtcDashboard dashboard;
     // - - - Constants + Variables - - - //
@@ -109,16 +111,21 @@ public class SimpleTeleop extends LinearOpMode {
             // A button for latching in current position
             if (gamepad2.a) {
                 // Set latching indication to 1 to maintain the arm at the current position
-                LatchInd=1;
+                LatchInd = 1;
+                ArmCurPosition=ArmMotor.getCurrentPosition();
             }
+
             if(LatchInd ==1){
                 // Holding the Arm in position when LatchInd is 1
-                armControl.latch();  // PID control to hold position
+                ArmMotor.setTargetPosition(ArmCurPosition);
+                ArmMotor.setPower(0.2);
+                ArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             }
             // Release latching when gampad2 B button is pushed
             if (gamepad2.b) {
                 LatchInd=0;
-                //ArmMotor.setPower(0);
+                ArmMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                ArmMotor.setPower(0);
             }
 
 
@@ -153,7 +160,7 @@ public class SimpleTeleop extends LinearOpMode {
             // Sending important data to telemetry to monitor
             telemetry.addData("Arm Position", ArmMotor.getCurrentPosition());
             telemetry.addData("Arm Motor Power", "%.2f",ArmMotor.getPower());
-            telemetry.addData("Holding Position", LatchInd);
+            telemetry.addData("Arm Loop Count", LpCnt);
             telemetry.addData("Elapsed Time", "%.3f", teleopTimer.time());
             telemetry.addData("TwoStage Position", TwoStageMotor.getCurrentPosition());
             telemetry.update();
