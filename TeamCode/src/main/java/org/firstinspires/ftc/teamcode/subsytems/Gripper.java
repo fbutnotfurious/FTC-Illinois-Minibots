@@ -33,7 +33,7 @@ public class Gripper {
 
 
     private static final double      ANGLER_UP     = 1.0; // deposit the pixel
-    private static final double      ANGLER_DOWN      = 0.65; // Loading the pixel
+    private static final double      ANGLER_DOWN      = 0.67; // Loading the pixel
     Telemetry       telemetry;
     LinearOpMode    opmode; // need content from Linear opmodes here. Elapsed time mainly
 

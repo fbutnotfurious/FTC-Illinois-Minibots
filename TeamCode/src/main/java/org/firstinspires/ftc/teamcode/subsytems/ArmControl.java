@@ -11,7 +11,7 @@ public class ArmControl {
     // Arm control variables
     private DcMotorEx ArmMotor;
     private double initialPosDeg=-20;
-    private double DepositAngle=55;
+    private double DepositAngle=79;
     private double IntakeAngle= -10;
 
     private double RuntoPositionPower=0.3;
@@ -58,18 +58,12 @@ public class ArmControl {
     }
     // Set Arm angle to the Deposit angle for deposit
     public void setArmDeposit() {
-        desArmPosTick = (int)((DepositAngle-initialPosDeg)/degreesPerTick);
-        ArmMotor.setTargetPosition(desArmPosTick);
-        ArmMotor.setPower(RuntoPositionPower);
-        ArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        setDesArmPosDeg(DepositAngle);
     }
 
     // Set Arm angle to the intake angle for intake
     public void setArmIntake() {
-        desArmPosTick = (int)((IntakeAngle-initialPosDeg)/degreesPerTick);
-        ArmMotor.setTargetPosition(desArmPosTick);
-        ArmMotor.setPower(RuntoPositionPower);
-        ArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        setDesArmPosDeg(IntakeAngle);
     }
 
     // Wrapper method to set the ArmMotor power level to PwrLevel

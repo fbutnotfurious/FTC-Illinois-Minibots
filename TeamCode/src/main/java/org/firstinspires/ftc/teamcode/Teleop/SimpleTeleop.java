@@ -40,8 +40,9 @@ public class SimpleTeleop extends LinearOpMode {
     private int ArmLatchInd= 0;
     private int ArmDepositInd=0;
     private int ArmIntakeInd=0;
+    private int SliderDepositInd=0;
     private int SliderIntakeInd=0;
-    private int SliderLatchInd=0;
+    private double SliderCurLen=0;
     private double ArmCurPosDeg;
     private PIDFCoefficients Default_Pid;
     FtcDashboard dashboard;
@@ -125,16 +126,6 @@ public class SimpleTeleop extends LinearOpMode {
                 armControl.setArmDeposit();
             }
 
-            // right bumper to set Arm to the intake angle for taking in the sample
-            if (gamepad2.right_bumper) {
-                ArmIntakeInd = 1;
-                ArmLatchInd=0;
-                ArmDepositInd=0;
-            }
-            if (ArmIntakeInd==1) {
-                armControl.setArmIntake();
-            }
-
             // Allow user to control the arm position once it is pushed more than 0.1 in magnitude
             if (Math.abs(gamepad2.right_stick_y) > 0.1) {
                     // Reset all the position indicators
@@ -149,43 +140,44 @@ public class SimpleTeleop extends LinearOpMode {
                     armControl.ArmRunModReset();
                 }
             }
-            
-            /*
-            // When gamepad2 B button is pushed, reset Arm runmode and rest all Indicators to zero
-            if (gamepad2.b) {
-                ArmLatchInd = 0;
-                ArmIntakeInd = 0;
-                ArmDepositInd = 0;
-                armControl.ArmRunModReset();
-            }*/
-
 
             // - - - Slider motor control - - - //
+            // right bumper to set slider to the full extension for deposit the sample
+            if (gamepad2.right_bumper) {
+                SliderDepositInd= 1;
+                SliderIntakeInd=0;
+            }
+            if (SliderDepositInd==1) {
+                sliderControl.setSliderDeposit();;
+            }
+            // gamepad2 b button for set slider length to the Intake length
             if (gamepad2.b) {
                 SliderIntakeInd=1;
+                SliderDepositInd=0;
             }
             if( SliderIntakeInd==1){
                 sliderControl.setSliderIntake();
             }
-            // Controlling the slider motor using gamepad2's left and right triggers
+            // Controlling the slider motor using game pad2's left and right
+            // triggers once magnitude > 0.1
             if (gamepad2.left_trigger > 0.1) {
                 // extending the slider through driver control
                 // Reset the run to position indicators
+                SliderDepositInd=0;
                 SliderIntakeInd=0;
-                SliderLatchInd=0;
                 sliderControl.SliderRunModReset();
                 sliderControl.setSliderPower(-gamepad2.left_trigger * 0.8);
 
             } else if (gamepad2.right_trigger > 0.1) {
                 // Retracting the slider through driver control
                 // Reset the run to position indicators
+                SliderDepositInd=0;
                 SliderIntakeInd=0;
-                SliderLatchInd=0;
                 sliderControl.SliderRunModReset();
                 sliderControl.setSliderPower(gamepad2.right_trigger * 0.8);
 
             } else {
-                if (SliderIntakeInd==0 && SliderLatchInd==0) {
+                if (SliderDepositInd==0 && SliderIntakeInd==0) {
                     // zero power plus run mode reset
                     sliderControl.SliderRunModReset();
                 }
