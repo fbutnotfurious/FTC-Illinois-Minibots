@@ -12,8 +12,10 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.drive.MecanumDriveBase;
+import org.firstinspires.ftc.teamcode.subsytems.ArmControl;
+import org.firstinspires.ftc.teamcode.subsytems.SliderControl;
 import org.firstinspires.ftc.teamcode.subsytems.Gripper;
-// - - - - - - - - - - Imports - - - - - - - - - - - - -
+
 
 @Config
 @TeleOp(group = "Teleop")
@@ -31,16 +33,17 @@ public class SimpleTeleop extends LinearOpMode {
     private DcMotorEx TwoStageMotor;
     private ArmControl armControl;
     private Gripper gripper;
+    private SliderControl sliderControl;
     private double speedFactor = 0.45;
     private double RuntoPositionPower =0.4;
     private double DepositAngle=55;
-    private int LatchInd= 0;
-    private int DepositInd=0;
-    private int IntakeInd=0;
+    private int ArmLatchInd= 0;
+    private int ArmDepositInd=0;
+    private int ArmIntakeInd=0;
+    private int SliderIntakeInd=0;
+    private int SliderLatchInd=0;
     private double ArmCurPosDeg;
     private PIDFCoefficients Default_Pid;
-    private int LpCnt=0;
-    private boolean holdingPosition = false; // Tracking if arm is in hold mode
     FtcDashboard dashboard;
     // - - - Constants + Variables - - - //
     //- - - - - - - - - - - - - - Initialization - - - - - - - - - - - -
@@ -53,20 +56,15 @@ public class SimpleTeleop extends LinearOpMode {
         // - - - Setting up Mecanum Drive - - - //
         MecanumDriveBase drive = new MecanumDriveBase(hardwareMap);
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        // - - - Setting up Mecanum Drive - - - //
 
-        // - - - Setting up arm, two-stage motors, and gripper - - - //
-        armControl = new ArmControl(hardwareMap);
-        gripper = new Gripper(this);
+        // - - - Setting up Arm motors - - - //
+        armControl = new ArmControl(this);
+        armControl.init(hardwareMap);
 
-
-        // - - - Configuring motor modes and behaviors - - - //
-        TwoStageMotor = hardwareMap.get(DcMotorEx.class, "TwoStageMotor");
-        TwoStageMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        TwoStageMotor.setDirection(DcMotor.Direction.REVERSE);
-        TwoStageMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        // - - - Configuring motor modes and behaviors - - - //
+        // - - - Setting up Slider motors - - - //
+        sliderControl = new SliderControl(this);
+        sliderControl.init(hardwareMap);
+        
 
         // - - - Set up dashboard telemetry - - - //
         dashboard = FtcDashboard.getInstance();
@@ -75,11 +73,11 @@ public class SimpleTeleop extends LinearOpMode {
 
 
         // - - - Initialize gripper to starting position - - - //
+        gripper = new Gripper(this);
         gripper.init(hardwareMap);
         gripper.gripperStopped();
         gripper.setAnglerDown();
-        // - - - Initialize gripper to starting position - - - //
-
+        
         // - - - Waiting for start signal from driver station - - - //
         waitForStart();
         teleopTimer.reset();
@@ -102,68 +100,96 @@ public class SimpleTeleop extends LinearOpMode {
 
 
             // - - - Arm Control - - - /
-            // Allow user to control the arm position
-            if( IntakeInd==0 && LatchInd==0 && DepositInd==0) {
-                if (Math.abs(gamepad2.right_stick_y) > 0.1) {
-                    armControl.setArmPower(-1.0 * gamepad2.right_stick_y * 0.65);
-                } else {
-                    armControl.setArmPower(0);
-                }
-            }
-
+ 
             // A button for latching in current position
             if (gamepad2.a) {
                 // Set latching indication to 1 to maintain the arm at the current position
-                LatchInd = 1;
-                IntakeInd=0;
-                DepositInd=0;
+                ArmLatchInd = 1;
+                ArmIntakeInd=0;
+                ArmDepositInd=0;
                 ArmCurPosDeg= armControl.getActArmPosDeg();
             }
 
-            if(LatchInd ==1){
-                // Holding the Arm in position when LatchInd is 1
+            if(ArmLatchInd ==1){
+                // Holding the Arm in position when ArmLatchInd is 1
                 armControl.setDesArmPosDeg(ArmCurPosDeg);
             }
 
             // Left bumper to set Arm to the Deposit angle for depositing the sample
             if (gamepad2.left_bumper) {
-                DepositInd=1;
-                IntakeInd=0;
-                LatchInd=0;
+                ArmDepositInd=1;
+                ArmIntakeInd=0;
+                ArmLatchInd=0;
             }
-            if(DepositInd==1){
+            if(ArmDepositInd==1){
                 armControl.setArmDeposit();
             }
 
             // right bumper to set Arm to the intake angle for taking in the sample
             if (gamepad2.right_bumper) {
-                IntakeInd = 1;
-                LatchInd=0;
-                DepositInd=0;
+                ArmIntakeInd = 1;
+                ArmLatchInd=0;
+                ArmDepositInd=0;
             }
-            if (IntakeInd==1) {
+            if (ArmIntakeInd==1) {
                 armControl.setArmIntake();
             }
+
+            // Allow user to control the arm position once it is pushed more than 0.1 in magnitude
+            if (Math.abs(gamepad2.right_stick_y) > 0.1) {
+                    // Reset all the position indicators
+                    ArmIntakeInd = 0;
+                    ArmLatchInd=0;
+                    ArmDepositInd=0;
+                    armControl.ArmRunModReset();
+                    armControl.setArmPower(-1.0 * gamepad2.right_stick_y * 0.65);
+                } else {
+                if( ArmIntakeInd==0 && ArmLatchInd==0 && ArmDepositInd==0) {
+                    // zero power plus run mode reset
+                    armControl.ArmRunModReset();
+                }
+            }
+            
+            /*
             // When gamepad2 B button is pushed, reset Arm runmode and rest all Indicators to zero
             if (gamepad2.b) {
-                LatchInd = 0;
-                IntakeInd = 0;
-                DepositInd = 0;
+                ArmLatchInd = 0;
+                ArmIntakeInd = 0;
+                ArmDepositInd = 0;
                 armControl.ArmRunModReset();
+            }*/
+
+
+            // - - - Slider motor control - - - //
+            if (gamepad2.b) {
+                SliderIntakeInd=1;
             }
+            if( SliderIntakeInd==1){
+                sliderControl.setSliderIntake();
+            }
+            // Controlling the slider motor using gamepad2's left and right triggers
+            if (gamepad2.left_trigger > 0.1) {
+                // extending the slider through driver control
+                // Reset the run to position indicators
+                SliderIntakeInd=0;
+                SliderLatchInd=0;
+                sliderControl.SliderRunModReset();
+                sliderControl.setSliderPower(-gamepad2.left_trigger * 0.8);
 
-
-            // - - - Two-stage motor control - - - //
-            // Controlling the two-stage motor using gamepad2's left and right triggers
-            if (gamepad2.left_trigger > 0) {
-                TwoStageMotor.setPower(-gamepad2.left_trigger); // Extend
-            } else if (gamepad2.right_trigger > 0) {
-                TwoStageMotor.setPower(gamepad2.right_trigger); // Retract
+            } else if (gamepad2.right_trigger > 0.1) {
+                // Retracting the slider through driver control
+                // Reset the run to position indicators
+                SliderIntakeInd=0;
+                SliderLatchInd=0;
+                sliderControl.SliderRunModReset();
+                sliderControl.setSliderPower(gamepad2.right_trigger * 0.8);
 
             } else {
-                TwoStageMotor.setPower(0); // Stop if neither trigger is pressed
+                if (SliderIntakeInd==0 && SliderLatchInd==0) {
+                    // zero power plus run mode reset
+                    sliderControl.SliderRunModReset();
+                }
             }
-
 
 
             // - - - Gripper control - - - //
@@ -187,7 +213,7 @@ public class SimpleTeleop extends LinearOpMode {
             telemetry.addData("Arm Current Position in Ticks", armControl.getActArmTick());
             telemetry.addData("Arm Motor Power", "%.2f",armControl.getArmPower());
             telemetry.addData("Elapsed Time", "%.2f", teleopTimer.time());
-            telemetry.addData("TwoStage Position", TwoStageMotor.getCurrentPosition());
+            telemetry.addData("TwoStage Position", sliderControl.getSliderLen());
             telemetry.update();
 
         }

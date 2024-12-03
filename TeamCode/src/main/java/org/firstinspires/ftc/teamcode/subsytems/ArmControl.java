@@ -1,9 +1,9 @@
-package org.firstinspires.ftc.teamcode.Teleop;
+package org.firstinspires.ftc.teamcode.subsytems;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 public class ArmControl {
 
@@ -20,8 +20,13 @@ public class ArmControl {
     private int desArmPosTick;
     private double degreesPerTick = 360.0 / 5/1425.1;
 
+    LinearOpMode    opmode;
+    public ArmControl(LinearOpMode opmode) {
+        this.opmode = opmode;
+    }
+
     // Constructor to initialize the arm motor
-    public ArmControl(HardwareMap hardwareMap) {
+    public void init(HardwareMap hardwareMap) {
         ArmMotor = hardwareMap.get(DcMotorEx.class, "ArmMotor");
         ArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         ArmMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
