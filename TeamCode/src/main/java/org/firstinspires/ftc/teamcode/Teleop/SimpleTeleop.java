@@ -29,8 +29,6 @@ public class SimpleTeleop extends LinearOpMode {
 
     // - - - Constants + Variables - - - //
     private static final double RAISE_SPEED = 1.0; // Full speed for raising
-    private DcMotorEx ArmMotor;
-    private DcMotorEx TwoStageMotor;
     private ArmControl armControl;
     private Gripper gripper;
     private SliderControl sliderControl;
