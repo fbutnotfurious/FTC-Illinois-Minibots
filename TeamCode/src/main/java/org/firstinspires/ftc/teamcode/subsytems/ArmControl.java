@@ -56,6 +56,14 @@ public class ArmControl {
         ArmMotor.setPower(RuntoPositionPower);
         ArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
+
+    // Increase the power level to 0.7 for hanging the robot in the end
+    public void setArmHanging(double tgtArmPosDeg) {
+        desArmPosTick = (int)((tgtArmPosDeg-initialPosDeg)/degreesPerTick);
+        ArmMotor.setTargetPosition(desArmPosTick);
+        ArmMotor.setPower(0.7);
+        ArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
     // Set Arm angle to the Deposit angle for deposit
     public void setArmDeposit() {
         setDesArmPosDeg(DepositAngle);

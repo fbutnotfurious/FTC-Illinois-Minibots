@@ -67,9 +67,14 @@ public class SliderControl {
         SliderMotor.setPower(RuntoPositionPower);
         SliderMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
-    //setSliderIntake: Set slider length to the intake length for intake
+    //setSliderIntake: Set slider length to IntakeLength
     public void setSliderIntake() {
         setDesSliderLen(IntakeLength);
+    }
+
+    //setSliderRetract: Set slider length to be 2in less than current length
+    public void setSliderRetract(double CurLen, double RetractLen) {
+        setDesSliderLen(CurLen-RetractLen);
     }
 
     //setSliderIntake: Set slider length to the Deposit length for deposit

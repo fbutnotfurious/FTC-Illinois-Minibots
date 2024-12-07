@@ -40,10 +40,11 @@ public class SimpleTeleop extends LinearOpMode {
     private int ArmDepositInd=0;
     private int ArmIntakeInd=0;
     private int SliderDepositInd=0;
-    private int SliderIntakeInd=0;
+    private int SliderRetractInd=0;
     private double SliderLenLimit=14.5;
     private double SliderCurLen;
     private double ArmCurPosDeg;
+    private int GripperRollInInd=0;
     private PIDFCoefficients Default_Pid;
     FtcDashboard dashboard;
     // - - - Constants + Variables - - - //
@@ -127,16 +128,17 @@ public class SimpleTeleop extends LinearOpMode {
             if(ArmDepositInd==1){
                 armControl.setArmDeposit();
             }
-            // Gamepad 1 a button: set arm power to 0.3 to hang the robot
+            // Gamepad 1 a button: set arm power to 0.7 to hang the robot
             if (gamepad1.a) {
                 ArmDepositInd=0;
                 ArmIntakeInd=0;
                 ArmLatchInd=0;
                 ArmHangInd=1;
+                ArmCurPosDeg= armControl.getActArmPosDeg();
             }
             if(ArmHangInd==1){
-                armControl.ArmRunModReset();
-                armControl.setArmPower(0.3);
+                armControl.setArmHanging(ArmCurPosDeg);
+
             }
             // Allow user to control the arm position once it is pushed more than 0.1 in magnitude
             if (Math.abs(gamepad2.right_stick_y) > 0.1) {
@@ -157,50 +159,56 @@ public class SimpleTeleop extends LinearOpMode {
             // - - - Slider motor control - - - //
             // gamepad1 B button will set gripper rolling in for depositing the specimen
             if(gamepad1.b) {
+                GripperRollInInd=1;
+            }
+            if(GripperRollInInd==1){
                 gripper.gripperForward(0.3);
             }
+
+            // gamepad1 X button will stop the Gripper power
+            if(gamepad1.x) {
+                GripperRollInInd=0;
+                gripper.gripperStopped();
+            }
+
             // right bumper to set slider to the full extension for deposit the sample
             if (gamepad2.right_bumper) {
                 SliderDepositInd= 1;
-                SliderIntakeInd=0;
+                SliderRetractInd=0;
             }
             if (SliderDepositInd==1) {
                 sliderControl.setSliderDeposit();;
             }
-            // gamepad2 b button for set slider length to the Intake length
+            // gamepad2 b button for set slider length to 2in less
             if (gamepad2.b) {
-                SliderIntakeInd=1;
+                SliderRetractInd=1;
                 SliderDepositInd=0;
+                SliderCurLen= sliderControl.getSliderLen();
             }
-            if( SliderIntakeInd==1){
-                sliderControl.setSliderIntake();
+            if( SliderRetractInd==1){
+                sliderControl.setSliderRetract(SliderCurLen,2);
             }
             // Controlling the slider motor using game pad2's left and right
             // triggers once magnitude > 0.1
             if (gamepad2.left_trigger > 0.1) {
-                // extending the slider through driver control
+                // Retracting the slider through driver control
                 // Reset the run to position indicators
+
                 SliderDepositInd=0;
-                SliderIntakeInd=0;
+                SliderRetractInd=0;
                 sliderControl.SliderRunModReset();
                 sliderControl.setSliderPower(-gamepad2.left_trigger * 0.8);
 
             } else if (gamepad2.right_trigger > 0.1) {
-                // Retracting the slider through driver control
+                // extending the slider through driver control
                 // Reset the run to position indicators
-                SliderDepositInd=0;
-                SliderIntakeInd=0;
+                SliderDepositInd = 0;
+                SliderRetractInd = 0;
                 sliderControl.SliderRunModReset();
-                SliderCurLen= sliderControl.getSliderLen();
-                if (SliderCurLen<=SliderLenLimit) {
-                    sliderControl.setSliderPower(gamepad2.right_trigger * 0.8);
-                }
-                else{
-                    sliderControl.setSliderPower(0);
-                }
-
+                SliderCurLen = sliderControl.getSliderLen();
+                sliderControl.setSliderPower(gamepad2.right_trigger * 0.8);
             } else {
-                if (SliderDepositInd==0 && SliderIntakeInd==0) {
+                if (SliderDepositInd==0 && SliderRetractInd==0) {
                     // zero power plus run mode reset
                     sliderControl.SliderRunModReset();
                 }
@@ -217,7 +225,9 @@ public class SimpleTeleop extends LinearOpMode {
             } else if (gamepad2.left_stick_x < -0.1) {
                 gripper.gripperReverse(gamepad2.left_stick_x); // Move gripper backwards
             } else {
-                gripper.gripperStopped(); // Stop gripper movement
+                if(GripperRollInInd==0){
+                    gripper.gripperStopped(); // Stop gripper movement
+                }
             }
 
 
@@ -229,6 +239,7 @@ public class SimpleTeleop extends LinearOpMode {
             telemetry.addData("Arm Motor Power", "%.2f",armControl.getArmPower());
             telemetry.addData("Elapsed Time", "%.2f", teleopTimer.time());
             telemetry.addData("TwoStage Position", sliderControl.getSliderLen());
+            telemetry.addData("Gripper Roll In Indicator", GripperRollInInd);
             telemetry.update();
 
         }
