@@ -107,14 +107,7 @@ public class RedObserverSide extends LinearOpMode {
 
         // Execute the trajectory sequence
         drive.followTrajectorySequence(StageRedObserver);
-        // Sending important data to telemetry to monitor
-        telemetry.addData("Arm Actual Position in Degree","%.3f", armControl.getActArmPosDeg());
-        telemetry.addData("Arm Tgt Position in Ticks", armControl.getTgtArmTick());
-        telemetry.addData("Arm Current Position in Ticks", armControl.getActArmTick());
-        telemetry.addData("Arm Motor Power", "%.2f",armControl.getArmPower());
-        telemetry.addData("Elapsed Time", "%.2f", AutoTimer.time());
-        telemetry.addData("TwoStage Position", sliderControl.getSliderLen());
-        telemetry.update();
+
 
 
     }

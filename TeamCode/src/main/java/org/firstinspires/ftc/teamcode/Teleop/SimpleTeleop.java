@@ -35,12 +35,14 @@ public class SimpleTeleop extends LinearOpMode {
     private double speedFactor = 0.45;
     private double RuntoPositionPower =0.4;
     private double DepositAngle=55;
+    private int ArmHangInd=0;
     private int ArmLatchInd= 0;
     private int ArmDepositInd=0;
     private int ArmIntakeInd=0;
     private int SliderDepositInd=0;
     private int SliderIntakeInd=0;
-    private double SliderCurLen=0;
+    private double SliderLenLimit=14.5;
+    private double SliderCurLen;
     private double ArmCurPosDeg;
     private PIDFCoefficients Default_Pid;
     FtcDashboard dashboard;
@@ -106,6 +108,7 @@ public class SimpleTeleop extends LinearOpMode {
                 ArmLatchInd = 1;
                 ArmIntakeInd=0;
                 ArmDepositInd=0;
+                ArmHangInd=0;
                 ArmCurPosDeg= armControl.getActArmPosDeg();
             }
 
@@ -119,27 +122,43 @@ public class SimpleTeleop extends LinearOpMode {
                 ArmDepositInd=1;
                 ArmIntakeInd=0;
                 ArmLatchInd=0;
+                ArmHangInd=0;
             }
             if(ArmDepositInd==1){
                 armControl.setArmDeposit();
             }
-
+            // Gamepad 1 a button: set arm power to 0.3 to hang the robot
+            if (gamepad1.a) {
+                ArmDepositInd=0;
+                ArmIntakeInd=0;
+                ArmLatchInd=0;
+                ArmHangInd=1;
+            }
+            if(ArmHangInd==1){
+                armControl.ArmRunModReset();
+                armControl.setArmPower(0.3);
+            }
             // Allow user to control the arm position once it is pushed more than 0.1 in magnitude
             if (Math.abs(gamepad2.right_stick_y) > 0.1) {
                     // Reset all the position indicators
                     ArmIntakeInd = 0;
                     ArmLatchInd=0;
                     ArmDepositInd=0;
+                    ArmHangInd=0;
                     armControl.ArmRunModReset();
                     armControl.setArmPower(-1.0 * gamepad2.right_stick_y * 0.65);
                 } else {
-                if( ArmIntakeInd==0 && ArmLatchInd==0 && ArmDepositInd==0) {
+                if( ArmIntakeInd==0 && ArmLatchInd==0 && ArmDepositInd==0 && ArmHangInd==0) {
                     // zero power plus run mode reset
                     armControl.ArmRunModReset();
                 }
             }
 
             // - - - Slider motor control - - - //
+            // gamepad1 B button will set gripper rolling in for depositing the specimen
+            if(gamepad1.b) {
+                gripper.gripperForward(0.3);
+            }
             // right bumper to set slider to the full extension for deposit the sample
             if (gamepad2.right_bumper) {
                 SliderDepositInd= 1;
@@ -172,7 +191,13 @@ public class SimpleTeleop extends LinearOpMode {
                 SliderDepositInd=0;
                 SliderIntakeInd=0;
                 sliderControl.SliderRunModReset();
-                sliderControl.setSliderPower(gamepad2.right_trigger * 0.8);
+                SliderCurLen= sliderControl.getSliderLen();
+                if (SliderCurLen<=SliderLenLimit) {
+                    sliderControl.setSliderPower(gamepad2.right_trigger * 0.8);
+                }
+                else{
+                    sliderControl.setSliderPower(0);
+                }
 
             } else {
                 if (SliderDepositInd==0 && SliderIntakeInd==0) {
