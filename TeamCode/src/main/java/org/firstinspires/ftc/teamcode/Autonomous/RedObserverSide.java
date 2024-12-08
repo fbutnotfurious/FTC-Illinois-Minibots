@@ -51,32 +51,54 @@ public class RedObserverSide extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         // Define starting position
-        Pose2d startPos = new Pose2d(3, 3, Math.toRadians(90));
+        Pose2d startPos = new Pose2d(8, 53, Math.toRadians(0));
         drive.setPoseEstimate(startPos);
+
+        Pose2d SpecimenDropoffPos = new Pose2d(33, 66, Math.toRadians(0));
 
         // Define the trajectory sequence
         TrajectorySequence StageRedObserver = drive.trajectorySequenceBuilder(startPos)
                 // Step 1: Set angler down
-                .UNSTABLE_addTemporalMarkerOffset(0.0,()->{gripper.setAnglerDown();})
-                .forward(3)
-                // Step 2: Turn left by 90 degrees
-                .turn(Math.toRadians(90))
+                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {armControl.setDesArmPosDeg(53);})
+                .UNSTABLE_addTemporalMarkerOffset(0.5,()->{gripper.setAnglerUP();})
 
-                // Step 3: Set angler up
-                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {gripper.setAnglerUP();})
-
-                // Step 4: Move forward 60 inches
-                .forward(2)
-
-                // Step 5: Set Arm to the Deposit angle
-                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> armControl.setArmDeposit())
+                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {sliderControl.setDesSliderLen(1);})
                 .waitSeconds(3)
-                // Step 6: Slider motor to the Intake length
-                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> sliderControl.setSliderIntake())
-                .waitSeconds(1)
+                .lineToLinearHeading(SpecimenDropoffPos)
+                .UNSTABLE_addTemporalMarkerOffset(0.0,()->{gripper.setAnglerDown();})
 
-                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> gripper.gripperReverse(-0.3))
+
+
+
                 .waitSeconds(1)
+                .forward(6)
+                // Step 5: Set Arm to the Deposit angle
+
+                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {armControl.setDesArmPosDeg(30);})
+                .UNSTABLE_addTemporalMarkerOffset(0.2, () -> gripper.gripperForward(0.3))
+                // Step 6: Slider motor to the Intake length
+                //.UNSTABLE_addTemporalMarkerOffset(0.5, () -> {sliderControl.setDesSliderLen(4);})
+                .waitSeconds(0.25)
+                .back(11)
+                .strafeRight(33)
+                .UNSTABLE_addTemporalMarkerOffset(0.5,()->{gripper.setAnglerUP();})
+                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {gripper.gripperStopped();})
+                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {armControl.setArmPower(0);})
+                .forward(28)
+                .strafeRight(12)
+                .back(43)
+                .forward(43)
+                .strafeRight(9)
+                .back(43)
+                .forward(43)
+                .strafeRight(7)
+                .back(43)
+
+
+
+                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {gripper.gripperStopped();})
+                .waitSeconds(1)
+                /*
 
                 .UNSTABLE_addTemporalMarkerOffset(0.5, () -> sliderControl.setDesSliderLen(1))
                 .UNSTABLE_addTemporalMarkerOffset(1.0, () -> gripper.gripperStopped())
@@ -98,7 +120,7 @@ public class RedObserverSide extends LinearOpMode {
                 // Step 7: Turn right by 90 degrees
                 //.turn(Math.toRadians(-90))
 
-                .strafeRight(2)
+                .strafeRight(2) */
 
                 .build();
 
