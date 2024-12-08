@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.subsytems.SliderControl;
 import org.firstinspires.ftc.teamcode.subsytems.Gripper;
 
 @Autonomous
-public class RedObserverSide extends LinearOpMode {
+public class RedBucketSide extends LinearOpMode {
 
     private ElapsedTime AutoTimer = new ElapsedTime();
     private ArmControl armControl;
@@ -51,36 +51,53 @@ public class RedObserverSide extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         // Define starting position
-        Pose2d startPos = new Pose2d(8, 53, Math.toRadians(0));
+        Pose2d startPos = new Pose2d(8, 87, Math.toRadians(0));
         drive.setPoseEstimate(startPos);
 
-        Pose2d SpecimenDropoffPos = new Pose2d(33, 66, Math.toRadians(0));
+        Pose2d SpecimenDropoffPos = new Pose2d(33, 74, Math.toRadians(0));
 
         // Define the trajectory sequence
         TrajectorySequence StageRedObserver = drive.trajectorySequenceBuilder(startPos)
                 // Step 1: Set angler down
                 .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {armControl.setDesArmPosDeg(53);})
                 .UNSTABLE_addTemporalMarkerOffset(0.5,()->{gripper.setAnglerUP();})
+
                 .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {sliderControl.setDesSliderLen(1);})
-                .waitSeconds(0.5)
+                .waitSeconds(3)
                 .lineToLinearHeading(SpecimenDropoffPos)
-                .UNSTABLE_addTemporalMarkerOffset(0.2,()->{gripper.setAnglerDown();})
-                .waitSeconds(0.2)
+                .UNSTABLE_addTemporalMarkerOffset(0.0,()->{gripper.setAnglerDown();})
+
+
+
+
+                .waitSeconds(1)
                 .forward(6)
                 // Step 5: Set Arm to the Deposit angle
 
-                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {armControl.setDesArmPosDeg(45);})
+                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {armControl.setDesArmPosDeg(30);})
                 .UNSTABLE_addTemporalMarkerOffset(0.2, () -> gripper.gripperForward(0.3))
                 // Step 6: Slider motor to the Intake length
                 //.UNSTABLE_addTemporalMarkerOffset(0.5, () -> {sliderControl.setDesSliderLen(4);})
                 .waitSeconds(0.25)
-                .back(11)
+                .back(14)
 
-                .strafeRight(33)
-                .UNSTABLE_addTemporalMarkerOffset(0.2,()->{gripper.setAnglerUP();})
-                .UNSTABLE_addTemporalMarkerOffset(0.1, () -> {gripper.gripperStopped();})
-                .UNSTABLE_addTemporalMarkerOffset(0.1, () -> {sliderControl.setDesSliderLen(0);})
-                .UNSTABLE_addTemporalMarkerOffset(0.1, () -> {armControl.setArmPower(0);})
+
+                .strafeLeft(32)
+                .UNSTABLE_addTemporalMarkerOffset(0.5,()->{gripper.setAnglerUP();})
+                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {gripper.gripperStopped();})
+                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {armControl.setArmPower(0);})
+                // turn 90 degree
+                .turn(Math.toRadians(90))
+                //Raise the arm
+                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {armControl.setDesArmPosDeg(30);})
+
+                .waitSeconds(0.25)
+                .strafeRight(25)
+                .back(4)
+                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {sliderControl.setDesSliderLen(sliderControl.getSliderLen()+2);})
+                .UNSTABLE_addTemporalMarkerOffset(0.2, () -> gripper.gripperForward(0.3))
+                .waitSeconds(0.25)
+/*
                 .forward(28)
                 .strafeRight(12)
                 .back(43)
@@ -123,6 +140,7 @@ public class RedObserverSide extends LinearOpMode {
 
         // Wait for start signal
         waitForStart();
+
 
         // Execute the trajectory sequence
         drive.followTrajectorySequence(StageRedObserver);
