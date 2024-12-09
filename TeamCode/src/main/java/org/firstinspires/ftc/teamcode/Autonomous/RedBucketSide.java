@@ -57,46 +57,47 @@ public class RedBucketSide extends LinearOpMode {
         Pose2d SpecimenDropoffPos = new Pose2d(33, 74, Math.toRadians(0));
 
         // Define the trajectory sequence
-        TrajectorySequence StageRedObserver = drive.trajectorySequenceBuilder(startPos)
+        TrajectorySequence StageRedBucket = drive.trajectorySequenceBuilder(startPos)
                 // Step 1: Set angler down
-                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {armControl.setDesArmPosDeg(53);})
+                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {armControl.setDesArmPosDeg(56);})
                 .UNSTABLE_addTemporalMarkerOffset(0.5,()->{gripper.setAnglerUP();})
 
-                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {sliderControl.setDesSliderLen(1);})
+                //.UNSTABLE_addTemporalMarkerOffset(0.5, () -> {sliderControl.setDesSliderLen(1);})
                 .waitSeconds(3)
                 .lineToLinearHeading(SpecimenDropoffPos)
                 .UNSTABLE_addTemporalMarkerOffset(0.0,()->{gripper.setAnglerDown();})
-
-
 
 
                 .waitSeconds(1)
                 .forward(6)
                 // Step 5: Set Arm to the Deposit angle
 
-                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {armControl.setDesArmPosDeg(30);})
-                .UNSTABLE_addTemporalMarkerOffset(0.2, () -> gripper.gripperForward(0.3))
+                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {armControl.setDesArmPosDeg(45);})
                 // Step 6: Slider motor to the Intake length
                 //.UNSTABLE_addTemporalMarkerOffset(0.5, () -> {sliderControl.setDesSliderLen(4);})
-                .waitSeconds(0.25)
+                .waitSeconds(0.1)
+                .UNSTABLE_addTemporalMarkerOffset(0.2, () -> gripper.gripperForward(0.3))
+                .UNSTABLE_addTemporalMarkerOffset(0.6, () -> {gripper.gripperStopped();})
                 .back(14)
 
 
-                .strafeLeft(32)
-                .UNSTABLE_addTemporalMarkerOffset(0.5,()->{gripper.setAnglerUP();})
-                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {gripper.gripperStopped();})
+                .strafeLeft(30)
+                .UNSTABLE_addTemporalMarkerOffset(0.0,()->{gripper.setAnglerUP();})
                 .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {armControl.setArmPower(0);})
                 // turn 90 degree
                 .turn(Math.toRadians(90))
                 //Raise the arm
-                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {armControl.setDesArmPosDeg(30);})
-
-                .waitSeconds(0.25)
-                .strafeRight(25)
-                .back(4)
-                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {sliderControl.setDesSliderLen(sliderControl.getSliderLen()+2);})
-                .UNSTABLE_addTemporalMarkerOffset(0.2, () -> gripper.gripperForward(0.3))
-                .waitSeconds(0.25)
+                .waitSeconds(0.1)
+                .strafeRight(27)
+                .back(6)
+                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {armControl.setDesArmPosDeg(-20);})
+                .waitSeconds(0.2)
+                .UNSTABLE_addTemporalMarkerOffset(0.2, () -> {sliderControl.setDesSliderLen(3);})
+                .waitSeconds(0.2)
+                //problem here
+                //took offset of 0.2 and made it a waitSeconds function instead
+                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> gripper.gripperForward(0.3))
+                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {gripper.gripperStopped();})
 /*
                 .forward(28)
                 .strafeRight(12)
@@ -143,7 +144,7 @@ public class RedBucketSide extends LinearOpMode {
 
 
         // Execute the trajectory sequence
-        drive.followTrajectorySequence(StageRedObserver);
+        drive.followTrajectorySequence(StageRedBucket);
 
 
 
