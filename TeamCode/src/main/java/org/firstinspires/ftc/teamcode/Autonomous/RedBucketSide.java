@@ -58,6 +58,7 @@ public class RedBucketSide extends LinearOpMode {
 
         // Define the trajectory sequence
         TrajectorySequence StageRedBucket = drive.trajectorySequenceBuilder(startPos)
+                /*
                 // Step 1: Set angler down
                 .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {armControl.setDesArmPosDeg(56);})
                 .UNSTABLE_addTemporalMarkerOffset(0.5,()->{gripper.setAnglerUP();})
@@ -93,12 +94,25 @@ public class RedBucketSide extends LinearOpMode {
                 .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {armControl.setArmPower(0);})
                 .UNSTABLE_addTemporalMarkerOffset(0.2, () -> {sliderControl.setDesSliderLen(sliderControl.getSliderLen()+2);})
                 .waitSeconds(1)
+
+                 */
                 //problem here
                 //took offset of 0.2 and made it a waitSeconds function instead
                 //changed factor 0.3->0.6 (look at gripper forward preset conditions, rather use bigger factor)
-                .UNSTABLE_addTemporalMarkerOffset(0.1, () -> {gripper.gripperForward(0.3);})
+                //.UNSTABLE_addTemporalMarkerOffset(0.1, () -> {gripper.gripperForward(0.3);})
                 .waitSeconds(1)
-                .UNSTABLE_addTemporalMarkerOffset(0.2, () -> {gripper.gripperStopped();})
+                .UNSTABLE_addTemporalMarkerOffset(0.2, () -> gripper.gripperForward(0.3))
+                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {gripper.gripperStopped();})
+                .waitSeconds(3)
+                .forward(1)
+                .UNSTABLE_addTemporalMarkerOffset(0.2, () -> {gripper.gripperForward(0.3);})
+                .UNSTABLE_addTemporalMarkerOffset(2, () -> {gripper.gripperStopped();})
+
+                // The following wait time is important to let the upper command sequence complete.
+                // Without this time window, the control will just stop here without any actual operation,
+                // which was the case for the bucket side tuning with the gripper not rolling
+                .waitSeconds(2)
+                //.UNSTABLE_addTemporalMarkerOffset(0.9, () -> {gripper.gripperStopped();})
 
                 //final build
                 .build();
