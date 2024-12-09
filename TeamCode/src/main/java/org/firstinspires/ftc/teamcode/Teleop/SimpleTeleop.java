@@ -32,7 +32,7 @@ public class SimpleTeleop extends LinearOpMode {
     private ArmControl armControl;
     private Gripper gripper;
     private SliderControl sliderControl;
-    private double speedFactor = 0.45;
+    private double speedFactor = 0.6;
     private double RuntoPositionPower =0.4;
     private double DepositAngle=55;
     private int ArmHangInd=0;

@@ -77,66 +77,30 @@ public class RedBucketSide extends LinearOpMode {
                 //.UNSTABLE_addTemporalMarkerOffset(0.5, () -> {sliderControl.setDesSliderLen(4);})
                 .waitSeconds(0.1)
                 .UNSTABLE_addTemporalMarkerOffset(0.2, () -> gripper.gripperForward(0.3))
-                .UNSTABLE_addTemporalMarkerOffset(0.6, () -> {gripper.gripperStopped();})
+                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {gripper.gripperStopped();})
                 .back(14)
 
 
                 .strafeLeft(30)
                 .UNSTABLE_addTemporalMarkerOffset(0.0,()->{gripper.setAnglerUP();})
-                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {armControl.setArmPower(0);})
+                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {armControl.setDesArmPosDeg(-15);})
                 // turn 90 degree
                 .turn(Math.toRadians(90))
                 //Raise the arm
                 .waitSeconds(0.1)
                 .strafeRight(27)
                 .back(6)
-                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {armControl.setDesArmPosDeg(-20);})
-                .waitSeconds(0.2)
-                .UNSTABLE_addTemporalMarkerOffset(0.2, () -> {sliderControl.setDesSliderLen(3);})
-                .waitSeconds(0.2)
+                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {armControl.setArmPower(0);})
+                .UNSTABLE_addTemporalMarkerOffset(0.2, () -> {sliderControl.setDesSliderLen(sliderControl.getSliderLen()+2);})
+                .waitSeconds(1)
                 //problem here
                 //took offset of 0.2 and made it a waitSeconds function instead
-                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> gripper.gripperForward(0.3))
-                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {gripper.gripperStopped();})
-/*
-                .forward(28)
-                .strafeRight(12)
-                .back(43)
-                .forward(43)
-                .strafeRight(9)
-                .back(43)
-                .forward(43)
-                .strafeRight(7)
-                .back(43)
-
-
-
-                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {gripper.gripperStopped();})
+                //changed factor 0.3->0.6 (look at gripper forward preset conditions, rather use bigger factor)
+                .UNSTABLE_addTemporalMarkerOffset(0.1, () -> {gripper.gripperForward(0.3);})
                 .waitSeconds(1)
-                /*
+                .UNSTABLE_addTemporalMarkerOffset(0.2, () -> {gripper.gripperStopped();})
 
-                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> sliderControl.setDesSliderLen(1))
-                .UNSTABLE_addTemporalMarkerOffset(1.0, () -> gripper.gripperStopped())
-                .waitSeconds(3)
-                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> gripper.gripperForward(0.3))
-                .waitSeconds(1)
-                // Step 7: Move back by 90 inches
-                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> armControl.setArmIntake())
-                .UNSTABLE_addTemporalMarkerOffset(1.0, () -> gripper.gripperStopped())
-                .waitSeconds(2 )
-                .back(2)
-                .waitSeconds(3)
-
-
-                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> armControl.setDesArmPosDeg(-10))
-
-                .waitSeconds(3)
-
-                // Step 7: Turn right by 90 degrees
-                //.turn(Math.toRadians(-90))
-
-                .strafeRight(2) */
-
+                //final build
                 .build();
 
         // Wait for start signal
