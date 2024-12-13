@@ -94,6 +94,9 @@ public class SimpleTeleop extends LinearOpMode {
 
             // - - - Mecanum drive control - - - //
             // Control the robot's movement with the gamepad 1's sticks
+            if(gamepad1.y){
+                speedFactor = 0.7;
+            }
             drive.setWeightedDrivePower(new Pose2d(
                     -gamepad1.right_stick_y * speedFactor, // Forward/Backward Movement
                     -gamepad1.left_stick_x * speedFactor, // Strafing Left/right
@@ -240,6 +243,7 @@ public class SimpleTeleop extends LinearOpMode {
             telemetry.addData("Elapsed Time", "%.2f", teleopTimer.time());
             telemetry.addData("TwoStage Position", sliderControl.getSliderLen());
             telemetry.addData("Gripper Roll In Indicator", GripperRollInInd);
+            telemetry.addData("Active Speed Factor: ", speedFactor);
             telemetry.update();
 
         }

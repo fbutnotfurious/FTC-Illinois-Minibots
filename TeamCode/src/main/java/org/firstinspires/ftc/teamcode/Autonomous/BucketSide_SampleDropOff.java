@@ -8,16 +8,14 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
-
-// Customized classes and methods
 import org.firstinspires.ftc.teamcode.drive.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.subsytems.ArmControl;
-import org.firstinspires.ftc.teamcode.subsytems.SliderControl;
 import org.firstinspires.ftc.teamcode.subsytems.Gripper;
+import org.firstinspires.ftc.teamcode.subsytems.SliderControl;
+import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
 @Autonomous
-public class RedBucketSide extends LinearOpMode {
+public class BucketSide_SampleDropOff extends LinearOpMode {
 
     private ElapsedTime AutoTimer = new ElapsedTime();
     private ArmControl armControl;
@@ -87,18 +85,7 @@ public class RedBucketSide extends LinearOpMode {
 
 
                 .back(10)
-                .strafeLeft(30)
-                .forward(31)
-                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {sliderControl.setDesSliderLen(8);})
-                .turn(Math.toRadians(-90))
-                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {armControl.setDesArmPosDeg(28);})
-                .waitSeconds(1)
-                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {armControl.setArmPower(0);})
 
-
-
-
-                /*
                 .strafeLeft(30)
                 .UNSTABLE_addTemporalMarkerOffset(0.0,()->{gripper.setAnglerUP();})
                 .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {armControl.setDesArmPosDeg(-15);})
@@ -107,13 +94,15 @@ public class RedBucketSide extends LinearOpMode {
                 //Raise the arm
                 .waitSeconds(0.1)
                 .strafeRight(27)
+
+                // Pose2d for precise positioning //measure it
                 .back(4)
                 .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {armControl.setArmPower(0);}).UNSTABLE_addTemporalMarkerOffset(0.2, () -> {sliderControl.setDesSliderLen(sliderControl.getSliderLen()+5);})
                 .waitSeconds(1)
 
                 // Try to roll in the sample
                 .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {gripper.gripperForward(0.3);})
-                .UNSTABLE_addTemporalMarkerOffset(1.0, () -> {gripper.gripperStopped();})
+                .UNSTABLE_addTemporalMarkerOffset(1.1, () -> {gripper.gripperStopped();})
                 // The following wait time is important to let the upper command sequence complete.
                 // Without this time window, the control will just stop here without any actual operation,
                 // which was the case for the bucket side tuning with the gripper not rolling
@@ -128,7 +117,7 @@ public class RedBucketSide extends LinearOpMode {
                 .forward(2)
                 .UNSTABLE_addTemporalMarkerOffset(0.2, () -> {gripper.gripperReverse(-0.3);})
                 //.UNSTABLE_addTemporalMarkerOffset(0.9, () -> {gripper.gripperStopped();})
-                */
+
 
                 .waitSeconds(1)
 

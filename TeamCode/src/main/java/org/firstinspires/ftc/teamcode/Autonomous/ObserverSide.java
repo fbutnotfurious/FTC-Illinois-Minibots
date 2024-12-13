@@ -8,16 +8,14 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
-
-// Customized classes and methods
 import org.firstinspires.ftc.teamcode.drive.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.subsytems.ArmControl;
-import org.firstinspires.ftc.teamcode.subsytems.SliderControl;
 import org.firstinspires.ftc.teamcode.subsytems.Gripper;
+import org.firstinspires.ftc.teamcode.subsytems.SliderControl;
+import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
 @Autonomous
-public class RedObserverSide extends LinearOpMode {
+public class ObserverSide extends LinearOpMode {
 
     private ElapsedTime AutoTimer = new ElapsedTime();
     private ArmControl armControl;

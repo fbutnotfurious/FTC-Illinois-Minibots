@@ -8,16 +8,14 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
-
-// Customized classes and methods
 import org.firstinspires.ftc.teamcode.drive.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.subsytems.ArmControl;
-import org.firstinspires.ftc.teamcode.subsytems.SliderControl;
 import org.firstinspires.ftc.teamcode.subsytems.Gripper;
+import org.firstinspires.ftc.teamcode.subsytems.SliderControl;
+import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
 @Autonomous
-public class RedBucketSide extends LinearOpMode {
+public class BucketSide_PushSampleBack extends LinearOpMode {
 
     private ElapsedTime AutoTimer = new ElapsedTime();
     private ArmControl armControl;
@@ -55,7 +53,10 @@ public class RedBucketSide extends LinearOpMode {
         drive.setPoseEstimate(startPos);
 
         Pose2d SpecimenDropoffPos = new Pose2d(33, 74, Math.toRadians(0));
-        Pose2d SampleDropoffPos = new Pose2d(16, 126, Math.toRadians(135));
+        Pose2d SampleDropoffPos1 = new Pose2d(13, 125, Math.toRadians(-45));
+        Pose2d SampleDropoffPos2 = new Pose2d(16, 126, Math.toRadians(-45));
+        Pose2d PushPos1 = new Pose2d(56, 100, Math.toRadians(0));
+        Pose2d PushPos2 = new Pose2d(56, 120, Math.toRadians(0));
 
         // Define the trajectory sequence
         TrajectorySequence StageRedBucket = drive.trajectorySequenceBuilder(startPos)
@@ -65,7 +66,7 @@ public class RedBucketSide extends LinearOpMode {
                 .UNSTABLE_addTemporalMarkerOffset(0.0,()->{gripper.setAnglerUP();})
 
                 //.UNSTABLE_addTemporalMarkerOffset(0.5, () -> {sliderControl.setDesSliderLen(1);})
-                .waitSeconds(0.5)
+                .waitSeconds(0.1)
                 .lineToLinearHeading(SpecimenDropoffPos)
                 .UNSTABLE_addTemporalMarkerOffset(0.0,()->{gripper.setAnglerDown();})
 
@@ -78,59 +79,42 @@ public class RedBucketSide extends LinearOpMode {
                 // Step 6: Slider motor to the Intake length
                 //.UNSTABLE_addTemporalMarkerOffset(0.5, () -> {sliderControl.setDesSliderLen(4);})
                 .waitSeconds(0.1)
-                .UNSTABLE_addTemporalMarkerOffset(0.2, () -> gripper.gripperForward(0.3))
-                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {gripper.gripperStopped();})
+                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> gripper.gripperForward(0.3))
+                .UNSTABLE_addTemporalMarkerOffset(0.3, () -> {gripper.gripperStopped();})
                 .back(5)
                 //.waitSeconds(1)
-                .UNSTABLE_addTemporalMarkerOffset(0.2, () -> gripper.gripperReverse(-0.3))
-                .UNSTABLE_addTemporalMarkerOffset(0.6, () -> {gripper.gripperStopped();})
+                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> gripper.gripperReverse(-0.3))
+                .UNSTABLE_addTemporalMarkerOffset(0.4, () -> {gripper.gripperStopped();})
 
 
                 .back(10)
                 .strafeLeft(30)
                 .forward(31)
-                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {sliderControl.setDesSliderLen(8);})
+                // strafe left to prepare for pushing the sample to SampleDropoffPos1
+                .strafeLeft(12)
+
+                // push sample to SampleDropoffPos1
+                .lineToLinearHeading(SampleDropoffPos1)
+
+                /*
+                // Go to PushPos2 for the second sample
+                .lineToLinearHeading(PushPos2)
+                .strafeLeft(5)
+
+                // push sample to SampleDropoffPos2
+                .lineToLinearHeading(SampleDropoffPos2)
+                */
+
+                // Go Back to the position PushPos1 for level 1 ascent
+                .lineToLinearHeading(PushPos1)
+                .UNSTABLE_addTemporalMarkerOffset(0.2, () -> {sliderControl.setDesSliderLen(8);})
                 .turn(Math.toRadians(-90))
                 .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {armControl.setDesArmPosDeg(28);})
-                .waitSeconds(1)
+                .waitSeconds(0.1)
                 .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {armControl.setArmPower(0);})
 
 
-
-
-                /*
-                .strafeLeft(30)
-                .UNSTABLE_addTemporalMarkerOffset(0.0,()->{gripper.setAnglerUP();})
-                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {armControl.setDesArmPosDeg(-15);})
-                // turn 90 degree
-                .turn(Math.toRadians(90))
-                //Raise the arm
-                .waitSeconds(0.1)
-                .strafeRight(27)
-                .back(4)
-                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {armControl.setArmPower(0);}).UNSTABLE_addTemporalMarkerOffset(0.2, () -> {sliderControl.setDesSliderLen(sliderControl.getSliderLen()+5);})
-                .waitSeconds(1)
-
-                // Try to roll in the sample
-                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {gripper.gripperForward(0.3);})
-                .UNSTABLE_addTemporalMarkerOffset(1.0, () -> {gripper.gripperStopped();})
-                // The following wait time is important to let the upper command sequence complete.
-                // Without this time window, the control will just stop here without any actual operation,
-                // which was the case for the bucket side tuning with the gripper not rolling
-
-                // ** Run to the Deposit position with the Arm in the Deposit angle and slider full extended
-                .waitSeconds(1.2)
-                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {armControl.setArmDeposit();})
-                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {sliderControl.setSliderDeposit();})
-                .lineToLinearHeading(SampleDropoffPos)
-
-                // Move forward 2 inch and roll out to deposit the sample
-                .forward(2)
-                .UNSTABLE_addTemporalMarkerOffset(0.2, () -> {gripper.gripperReverse(-0.3);})
-                //.UNSTABLE_addTemporalMarkerOffset(0.9, () -> {gripper.gripperStopped();})
-                */
-
-                .waitSeconds(1)
+                .waitSeconds(0.5)
 
 
                 //final build
